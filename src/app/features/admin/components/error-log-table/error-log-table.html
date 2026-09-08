@@ -1,0 +1,27 @@
+<p-table [value]="logs()" dataKey="id" [rowTrackBy]="trackById" styleClass="w-full">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Nivel</th>
+      <th>Mensaje</th>
+      <th>Excepción</th>
+      <th>Ruta</th>
+      <th>Fecha</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-entry>
+    <tr>
+      <td><p-tag [value]="entry.level" [severity]="severityFor(entry.level)" /></td>
+      <td>{{ entry.message }}</td>
+      <td class="text-xs text-surface-500">{{ entry.exceptionType }}</td>
+      <td class="text-xs text-surface-500">{{ entry.httpMethod }} {{ entry.path }}</td>
+      <td>{{ entry.createdAt | date: 'short' }}</td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="5" class="text-center text-surface-500 py-6">No hay errores registrados.</td>
+    </tr>
+  </ng-template>
+</p-table>

@@ -12,6 +12,12 @@
            class="text-surface-600 dark:text-surface-300 hover:text-primary-600">
           Mis préstamos
         </a>
+        @if (currentUser()?.role === 'ADMIN') {
+          <a routerLink="/admin" routerLinkActive="font-semibold text-primary-600"
+             class="text-surface-600 dark:text-surface-300 hover:text-primary-600">
+            Administración
+          </a>
+        }
       </nav>
     }
   </div>

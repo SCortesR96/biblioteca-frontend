@@ -1,0 +1,25 @@
+<div class="p-6 flex flex-col gap-8">
+  <section>
+    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-4">Resumen</h2>
+    @if (stats(); as s) {
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <app-stat-card label="Préstamos activos" [value]="s.prestamosActivos" />
+        <app-stat-card label="Préstamos vencidos" [value]="s.prestamosVencidos" />
+        <app-stat-card label="Reservas activas" [value]="s.reservasActivas" />
+        <app-stat-card label="Cuentas bloqueadas" [value]="s.cuentasBloqueadas" />
+      </div>
+    }
+  </section>
+
+  <section>
+    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-4">Cuentas bloqueadas</h2>
+    <app-blocked-users-table [users]="blockedUsers()" (unblock)="onUnblock($event)" />
+  </section>
+
+  <section>
+    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-4">Bitácora de errores</h2>
+    @if (errorLogs(); as logs) {
+      <app-error-log-table [logs]="logs.content" />
+    }
+  </section>
+</div>

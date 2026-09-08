@@ -62,4 +62,14 @@ describe('AppHeader', () => {
 
     expect(fixture.nativeElement.querySelector('nav')).toBeNull();
   });
+
+  it('shows the "Administración" link only for ADMIN users', async () => {
+    expect(fixture.nativeElement.textContent).not.toContain('Administración');
+
+    authStub.currentUser.set({ name: 'Root', email: 'admin@biblioteca.com', role: 'ADMIN' });
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.textContent).toContain('Administración');
+  });
 });
