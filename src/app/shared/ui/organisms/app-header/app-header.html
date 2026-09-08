@@ -1,9 +1,9 @@
-<header class="flex items-center justify-between bg-white dark:bg-surface-900 shadow-sm px-6 py-4">
-  <div class="flex items-center gap-6">
+<header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white dark:bg-surface-900 shadow-sm px-4 sm:px-6 py-3 sm:py-4">
+  <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
     <h1 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Biblioteca</h1>
 
     @if (currentUser()) {
-      <nav class="flex items-center gap-4 text-sm">
+      <nav class="flex items-center gap-3 sm:gap-4 text-sm flex-wrap">
         <a routerLink="/" routerLinkActive="font-semibold text-primary-600" [routerLinkActiveOptions]="{ exact: true }"
            class="text-surface-600 dark:text-surface-300 hover:text-primary-600">
           Catálogo
@@ -23,11 +23,11 @@
   </div>
 
   @if (currentUser(); as user) {
-    <div class="flex items-center gap-4">
-      <span class="text-sm text-surface-600 dark:text-surface-300">
+    <div class="flex items-center justify-between sm:justify-end gap-4">
+      <span class="text-sm text-surface-600 dark:text-surface-300 truncate">
         {{ user.name }} · {{ user.role }}
       </span>
-      <app-button label="Cerrar sesión" (click)="logout()" />
+      <app-button label="Cerrar sesión" (click)="logout()" class="shrink-0" />
     </div>
   }
 </header>

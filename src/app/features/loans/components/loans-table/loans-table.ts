@@ -1,12 +1,23 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { TableModule } from 'primeng/table';
 import type { LoanItem } from '../../../../core/services/loan.types';
 import { Button } from '../../../../shared/ui/atoms/button/button';
 import { OverdueBadge } from '../../../../shared/ui/atoms/overdue-badge/overdue-badge';
+import { ColumnTemplate } from '../../../../shared/ui/organisms/data-table/column-template';
+import { DataTable } from '../../../../shared/ui/organisms/data-table/data-table';
+import type { TableColumn } from '../../../../shared/ui/organisms/data-table/data-table.types';
+
+const COLUMNS: TableColumn[] = [
+  { field: 'bookTitle', header: 'Libro' },
+  { field: 'bookIsbn', header: 'ISBN', class: 'hidden sm:table-cell' },
+  { field: 'loanDate', header: 'Fecha de préstamo', class: 'hidden md:table-cell' },
+  { field: 'dueDate', header: 'Fecha límite' },
+  { field: 'estado', header: 'Estado' },
+  { field: 'actions', header: 'Acciones' },
+];
 
 @Component({
   selector: 'app-loans-table',
-  imports: [TableModule, OverdueBadge, Button],
+  imports: [DataTable, ColumnTemplate, OverdueBadge, Button],
   templateUrl: './loans-table.html',
   styleUrl: './loans-table.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,7 +28,5 @@ export class LoansTable {
 
   readonly returnLoan = output<LoanItem>();
 
-  protected trackById(_index: number, loan: LoanItem): number {
-    return loan.id;
-  }
+  protected readonly columns = COLUMNS;
 }

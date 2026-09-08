@@ -1,38 +1,21 @@
-<p-table [value]="loans()" [loading]="loading()" dataKey="id" [rowTrackBy]="trackById" styleClass="w-full">
-  <ng-template pTemplate="header">
-    <tr>
-      <th>Libro</th>
-      <th>ISBN</th>
-      <th>Fecha de préstamo</th>
-      <th>Fecha límite</th>
-      <th>Estado</th>
-      <th>Acciones</th>
-    </tr>
+<app-data-table
+  [value]="loans()"
+  [columns]="columns"
+  [loading]="loading()"
+  [globalFilterFields]="['bookTitle', 'bookIsbn']"
+  searchPlaceholder="Buscar por libro o ISBN..."
+  emptyMessage="Todavía no tienes préstamos."
+>
+  <ng-template appColumnTemplate="estado" let-loan>
+    <app-overdue-badge [returned]="loan.returnDate !== null" [overdue]="loan.overdue" />
+    @if (loan.reminderSent && !loan.returnDate) {
+      <span class="ml-2 text-xs text-surface-500" title="Ya se envió un recordatorio por correo">✉️ recordatorio enviado</span>
+    }
   </ng-template>
 
-  <ng-template pTemplate="body" let-loan>
-    <tr>
-      <td>{{ loan.bookTitle }}</td>
-      <td>{{ loan.bookIsbn }}</td>
-      <td>{{ loan.loanDate }}</td>
-      <td>{{ loan.dueDate }}</td>
-      <td>
-        <app-overdue-badge [returned]="loan.returnDate !== null" [overdue]="loan.overdue" />
-        @if (loan.reminderSent && !loan.returnDate) {
-          <span class="ml-2 text-xs text-surface-500" title="Ya se envió un recordatorio por correo">✉️ recordatorio enviado</span>
-        }
-      </td>
-      <td>
-        @if (!loan.returnDate) {
-          <app-button label="Devolver" (click)="returnLoan.emit(loan)" class="text-sm" />
-        }
-      </td>
-    </tr>
+  <ng-template appColumnTemplate="actions" let-loan>
+    @if (!loan.returnDate) {
+      <app-button label="Devolver" (click)="returnLoan.emit(loan)" class="text-sm" />
+    }
   </ng-template>
-
-  <ng-template pTemplate="emptymessage">
-    <tr>
-      <td colspan="6" class="text-center text-surface-500 py-6">Todavía no tienes préstamos.</td>
-    </tr>
-  </ng-template>
-</p-table>
+</app-data-table>

@@ -2,11 +2,11 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { Auth } from '../../../../core/services/auth';
 import { Loan } from '../../../../core/services/loan';
 import type { LoanItem } from '../../../../core/services/loan.types';
 import { Reservation } from '../../../../core/services/reservation';
 import type { ReservationItem } from '../../../../core/services/reservation.types';
+import { UiFeedback } from '../../../../core/services/ui-feedback';
 import { MyLoansPage } from './my-loans-page';
 
 const loan: LoanItem = {
@@ -31,6 +31,7 @@ describe('MyLoansPage', () => {
     myReservations: ReturnType<typeof signal>; loading: ReturnType<typeof signal>; error: ReturnType<typeof signal>;
     loadMine: ReturnType<typeof vi.fn>; cancel: ReturnType<typeof vi.fn>;
   };
+  let uiStub: { confirm: ReturnType<typeof vi.fn>; success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     loanStub = {
@@ -41,6 +42,7 @@ describe('MyLoansPage', () => {
       myReservations: signal<ReservationItem[]>([]), loading: signal(false), error: signal<string | null>(null),
       loadMine: vi.fn(), cancel: vi.fn(),
     };
+    uiStub = { confirm: vi.fn().mockResolvedValue(true), success: vi.fn(), error: vi.fn() };
 
     await TestBed.configureTestingModule({
       imports: [MyLoansPage],
@@ -48,7 +50,7 @@ describe('MyLoansPage', () => {
         provideRouter([]),
         { provide: Loan, useValue: loanStub },
         { provide: Reservation, useValue: reservationStub },
-        { provide: Auth, useValue: { currentUser: signal(null) } },
+        { provide: UiFeedback, useValue: uiStub },
       ],
     }).compileComponents();
 
@@ -62,41 +64,51 @@ describe('MyLoansPage', () => {
     expect(reservationStub.loadMine).toHaveBeenCalled();
   });
 
-  it('onReturn() calls Loan.returnLoan with the loan id', () => {
+  it('onReturn() calls Loan.returnLoan with the loan id and shows a success toast', () => {
     loanStub.returnLoan.mockReturnValue(of(loan));
     fixture.detectChanges();
 
     component['onReturn'](loan);
 
     expect(loanStub.returnLoan).toHaveBeenCalledWith(1);
+    expect(uiStub.success).toHaveBeenCalled();
   });
 
-  it('onReturn() alerts the user when the return fails', () => {
+  it('onReturn() shows an error toast when the return fails', () => {
     loanStub.returnLoan.mockReturnValue(throwError(() => new Error('fail')));
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
     fixture.detectChanges();
 
     component['onReturn'](loan);
 
-    expect(alertSpy).toHaveBeenCalled();
+    expect(uiStub.error).toHaveBeenCalled();
   });
 
-  it('onCancelReservation() calls Reservation.cancel with the reservation id', () => {
+  it('onCancelReservation() asks for confirmation before cancelling', async () => {
+    uiStub.confirm.mockResolvedValue(false);
+    fixture.detectChanges();
+
+    await component['onCancelReservation'](reservation);
+
+    expect(uiStub.confirm).toHaveBeenCalledWith(expect.objectContaining({ severity: 'warn' }));
+    expect(reservationStub.cancel).not.toHaveBeenCalled();
+  });
+
+  it('onCancelReservation() cancels and shows a success toast when confirmed', async () => {
     reservationStub.cancel.mockReturnValue(of(undefined));
     fixture.detectChanges();
 
-    component['onCancelReservation'](reservation);
+    await component['onCancelReservation'](reservation);
 
     expect(reservationStub.cancel).toHaveBeenCalledWith(1);
+    expect(uiStub.success).toHaveBeenCalled();
   });
 
-  it('onCancelReservation() alerts the user when the cancellation fails', () => {
+  it('onCancelReservation() shows an error toast when the cancellation fails', async () => {
     reservationStub.cancel.mockReturnValue(throwError(() => new Error('fail')));
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
     fixture.detectChanges();
 
-    component['onCancelReservation'](reservation);
+    await component['onCancelReservation'](reservation);
 
-    expect(alertSpy).toHaveBeenCalled();
+    expect(uiStub.error).toHaveBeenCalled();
   });
 });

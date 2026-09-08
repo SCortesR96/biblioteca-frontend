@@ -1,12 +1,33 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { TableModule } from 'primeng/table';
 import type { BookItem } from '../../../../core/services/book.types';
+import { ColumnTemplate } from '../../../../shared/ui/organisms/data-table/column-template';
+import { DataTable } from '../../../../shared/ui/organisms/data-table/data-table';
+import type { TableColumn, TableSelectFilter } from '../../../../shared/ui/organisms/data-table/data-table.types';
 import { Button } from '../../../../shared/ui/atoms/button/button';
 import { StatusBadge } from '../../../../shared/ui/atoms/status-badge/status-badge';
 
+const COLUMNS: TableColumn[] = [
+  { field: 'title', header: 'Título' },
+  { field: 'author', header: 'Autor', class: 'hidden sm:table-cell' },
+  { field: 'isbn', header: 'ISBN', class: 'hidden md:table-cell' },
+  { field: 'publicationYear', header: 'Año', class: 'hidden md:table-cell' },
+  { field: 'status', header: 'Estado' },
+  { field: 'actions', header: 'Acciones' },
+];
+
+const STATUS_FILTER: TableSelectFilter = {
+  field: 'status',
+  placeholder: 'Todos los estados',
+  options: [
+    { label: 'Disponible', value: 'DISPONIBLE' },
+    { label: 'Prestado', value: 'PRESTADO' },
+    { label: 'Reservado', value: 'RESERVADO' },
+  ],
+};
+
 @Component({
   selector: 'app-catalog-table',
-  imports: [TableModule, StatusBadge, Button],
+  imports: [DataTable, ColumnTemplate, StatusBadge, Button],
   templateUrl: './catalog-table.html',
   styleUrl: './catalog-table.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,7 +41,6 @@ export class CatalogTable {
   readonly borrowBook = output<BookItem>();
   readonly reserveBook = output<BookItem>();
 
-  protected trackById(_index: number, book: BookItem): number {
-    return book.id;
-  }
+  protected readonly columns = COLUMNS;
+  protected readonly statusFilter = STATUS_FILTER;
 }

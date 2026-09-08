@@ -1,27 +1,20 @@
-<p-table [value]="logs()" dataKey="id" [rowTrackBy]="trackById" styleClass="w-full">
-  <ng-template pTemplate="header">
-    <tr>
-      <th>Nivel</th>
-      <th>Mensaje</th>
-      <th>Excepción</th>
-      <th>Ruta</th>
-      <th>Fecha</th>
-    </tr>
+<app-data-table
+  [value]="logs()"
+  [columns]="columns"
+  [globalFilterFields]="['message', 'exceptionType', 'path']"
+  [selectFilter]="levelFilter"
+  searchPlaceholder="Buscar por mensaje, excepción o ruta..."
+  emptyMessage="No hay errores registrados."
+>
+  <ng-template appColumnTemplate="level" let-entry>
+    <p-tag [value]="entry.level" [severity]="severityFor(entry.level)" />
   </ng-template>
 
-  <ng-template pTemplate="body" let-entry>
-    <tr>
-      <td><p-tag [value]="entry.level" [severity]="severityFor(entry.level)" /></td>
-      <td>{{ entry.message }}</td>
-      <td class="text-xs text-surface-500">{{ entry.exceptionType }}</td>
-      <td class="text-xs text-surface-500">{{ entry.httpMethod }} {{ entry.path }}</td>
-      <td>{{ entry.createdAt | date: 'short' }}</td>
-    </tr>
+  <ng-template appColumnTemplate="path" let-entry>
+    <span class="text-xs text-surface-500">{{ entry.httpMethod }} {{ entry.path }}</span>
   </ng-template>
 
-  <ng-template pTemplate="emptymessage">
-    <tr>
-      <td colspan="5" class="text-center text-surface-500 py-6">No hay errores registrados.</td>
-    </tr>
+  <ng-template appColumnTemplate="createdAt" let-entry>
+    {{ entry.createdAt | date: 'short' }}
   </ng-template>
-</p-table>
+</app-data-table>

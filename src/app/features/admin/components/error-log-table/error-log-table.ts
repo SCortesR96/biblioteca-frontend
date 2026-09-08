@@ -1,8 +1,10 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import type { ErrorLogEntry, LogLevel } from '../../../../core/services/admin.types';
+import { ColumnTemplate } from '../../../../shared/ui/organisms/data-table/column-template';
+import { DataTable } from '../../../../shared/ui/organisms/data-table/data-table';
+import type { TableColumn, TableSelectFilter } from '../../../../shared/ui/organisms/data-table/data-table.types';
 
 const LEVEL_SEVERITIES: Record<LogLevel, 'info' | 'warn' | 'danger'> = {
   INFO: 'info',
@@ -10,9 +12,27 @@ const LEVEL_SEVERITIES: Record<LogLevel, 'info' | 'warn' | 'danger'> = {
   ERROR: 'danger',
 };
 
+const COLUMNS: TableColumn[] = [
+  { field: 'level', header: 'Nivel' },
+  { field: 'message', header: 'Mensaje' },
+  { field: 'exceptionType', header: 'Excepción', class: 'hidden md:table-cell text-xs text-surface-500' },
+  { field: 'path', header: 'Ruta', class: 'hidden lg:table-cell' },
+  { field: 'createdAt', header: 'Fecha' },
+];
+
+const LEVEL_FILTER: TableSelectFilter = {
+  field: 'level',
+  placeholder: 'Todos los niveles',
+  options: [
+    { label: 'Info', value: 'INFO' },
+    { label: 'Advertencia', value: 'WARN' },
+    { label: 'Error', value: 'ERROR' },
+  ],
+};
+
 @Component({
   selector: 'app-error-log-table',
-  imports: [TableModule, Tag, DatePipe],
+  imports: [DataTable, ColumnTemplate, Tag, DatePipe],
   templateUrl: './error-log-table.html',
   styleUrl: './error-log-table.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,9 +40,8 @@ const LEVEL_SEVERITIES: Record<LogLevel, 'info' | 'warn' | 'danger'> = {
 export class ErrorLogTable {
   readonly logs = input.required<ErrorLogEntry[]>();
 
-  protected trackById(_index: number, entry: ErrorLogEntry): number {
-    return entry.id;
-  }
+  protected readonly columns = COLUMNS;
+  protected readonly levelFilter = LEVEL_FILTER;
 
   protected severityFor(level: LogLevel): 'info' | 'warn' | 'danger' {
     return LEVEL_SEVERITIES[level];

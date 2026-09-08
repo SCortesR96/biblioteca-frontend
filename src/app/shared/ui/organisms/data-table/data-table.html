@@ -1,0 +1,68 @@
+<div class="flex flex-col gap-3">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <p-iconfield class="w-full sm:max-w-xs">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="text"
+        class="w-full"
+        [placeholder]="searchPlaceholder()"
+        (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+      />
+    </p-iconfield>
+
+    @if (selectFilter(); as filter) {
+      <p-select
+        [options]="filter.options"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="filter.placeholder"
+        [showClear]="true"
+        class="w-full sm:w-56"
+        (onChange)="dt.filter($event.value, filter.field, 'equals')"
+      />
+    }
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-surface-200 dark:border-surface-700">
+    <p-table
+      #dt
+      [value]="value()"
+      [loading]="loading()"
+      [dataKey]="dataKey()"
+      [rowTrackBy]="trackByRow"
+      [globalFilterFields]="globalFilterFields()"
+      styleClass="w-full min-w-[640px]"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          @for (col of columns(); track col.field) {
+            <th [class]="col.class">{{ col.header }}</th>
+          }
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          @for (col of columns(); track col.field) {
+            <td [class]="col.class">
+              @if (templateFor(col.field); as tpl) {
+                <ng-container *ngTemplateOutlet="tpl; context: { $implicit: row }" />
+              } @else {
+                {{ resolveValue(row, col.field) }}
+              }
+            </td>
+          }
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="columns().length" class="text-center text-surface-500 py-6">
+            {{ emptyMessage() }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

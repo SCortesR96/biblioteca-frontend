@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Admin } from '../../../../core/services/admin';
 import type { BlockedUser } from '../../../../core/services/admin.types';
+import { UiFeedback } from '../../../../core/services/ui-feedback';
 import { StatCard } from '../../../../shared/ui/atoms/stat-card/stat-card';
 import { BlockedUsersTable } from '../../components/blocked-users-table/blocked-users-table';
 import { ErrorLogTable } from '../../components/error-log-table/error-log-table';
@@ -20,6 +21,7 @@ import { ErrorLogTable } from '../../components/error-log-table/error-log-table'
 })
 export class AdminPage implements OnInit {
   private readonly admin = inject(Admin);
+  private readonly ui = inject(UiFeedback);
 
   protected readonly stats = this.admin.stats;
   protected readonly blockedUsers = this.admin.blockedUsers;
@@ -31,13 +33,22 @@ export class AdminPage implements OnInit {
     this.admin.loadErrorLogs();
   }
 
-  protected onUnblock(user: BlockedUser): void {
-    if (!window.confirm(`¿Desbloquear la cuenta de ${user.name}?`)) {
+  protected async onUnblock(user: BlockedUser): Promise<void> {
+    const confirmed = await this.ui.confirm({
+      message: `¿Desbloquear la cuenta de ${user.name}? Podrá volver a pedir préstamos de inmediato.`,
+      header: 'Desbloquear cuenta',
+      acceptLabel: 'Sí, desbloquear',
+      severity: 'warn',
+    });
+    if (!confirmed) {
       return;
     }
     this.admin.unblockUser(user.id).subscribe({
-      next: () => this.admin.loadStats(),
-      error: () => window.alert('No se pudo desbloquear la cuenta. Intenta de nuevo.'),
+      next: () => {
+        this.ui.success(`La cuenta de ${user.name} fue desbloqueada.`);
+        this.admin.loadStats();
+      },
+      error: () => this.ui.error('No se pudo desbloquear la cuenta. Intenta de nuevo.'),
     });
   }
 }

@@ -1,5 +1,5 @@
 <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4" novalidate>
-  <div class="flex items-end gap-2">
+  <div class="flex flex-col sm:flex-row sm:items-end gap-2">
     <div class="flex-1">
       <app-form-field label="ISBN" inputId="isbn">
         <app-text-input id="isbn" formControlName="isbn" placeholder="Ej: 9780140328721" />
@@ -10,7 +10,7 @@
       type="button"
       [loading]="lookingUp()"
       (click)="autocomplete()"
-      class="mb-1"
+      class="sm:mb-1"
     />
   </div>
 

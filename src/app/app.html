@@ -1,1 +1,9 @@
-<router-outlet />
+<div class="min-h-screen flex flex-col bg-surface-50 dark:bg-surface-950">
+  <app-header />
+  <main class="flex-1 flex flex-col">
+    <router-outlet />
+  </main>
+</div>
+
+<p-toast />
+<p-confirmdialog />

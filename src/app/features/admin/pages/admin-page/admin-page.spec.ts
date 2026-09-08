@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { Admin } from '../../../../core/services/admin';
 import type { AdminStats, BlockedUser, ErrorLogPage } from '../../../../core/services/admin.types';
+import { UiFeedback } from '../../../../core/services/ui-feedback';
 import { AdminPage } from './admin-page';
 
 const stats: AdminStats = { prestamosActivos: 3, prestamosVencidos: 1, reservasActivas: 2, cuentasBloqueadas: 1 };
@@ -17,6 +18,7 @@ describe('AdminPage', () => {
     loadStats: ReturnType<typeof vi.fn>; loadBlockedUsers: ReturnType<typeof vi.fn>;
     loadErrorLogs: ReturnType<typeof vi.fn>; unblockUser: ReturnType<typeof vi.fn>;
   };
+  let uiStub: { confirm: ReturnType<typeof vi.fn>; success: ReturnType<typeof vi.fn>; error: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     adminStub = {
@@ -28,10 +30,14 @@ describe('AdminPage', () => {
       loadErrorLogs: vi.fn(),
       unblockUser: vi.fn(),
     };
+    uiStub = { confirm: vi.fn().mockResolvedValue(true), success: vi.fn(), error: vi.fn() };
 
     await TestBed.configureTestingModule({
       imports: [AdminPage],
-      providers: [{ provide: Admin, useValue: adminStub }],
+      providers: [
+        { provide: Admin, useValue: adminStub },
+        { provide: UiFeedback, useValue: uiStub },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminPage);
@@ -54,34 +60,33 @@ describe('AdminPage', () => {
     expect(text).toContain('ana@biblioteca.com');
   });
 
-  it('onUnblock() does nothing when the user cancels the confirm dialog', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(false);
+  it('onUnblock() does nothing when the user cancels the confirmation dialog', async () => {
+    uiStub.confirm.mockResolvedValue(false);
     fixture.detectChanges();
 
-    component['onUnblock'](blockedUser);
+    await component['onUnblock'](blockedUser);
 
     expect(adminStub.unblockUser).not.toHaveBeenCalled();
   });
 
-  it('onUnblock() unblocks and refreshes stats when confirmed', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
+  it('onUnblock() asks for confirmation, unblocks and refreshes stats when confirmed', async () => {
     adminStub.unblockUser.mockReturnValue(of(undefined));
     fixture.detectChanges();
 
-    component['onUnblock'](blockedUser);
+    await component['onUnblock'](blockedUser);
 
+    expect(uiStub.confirm).toHaveBeenCalledWith(expect.objectContaining({ severity: 'warn' }));
     expect(adminStub.unblockUser).toHaveBeenCalledWith(1);
+    expect(uiStub.success).toHaveBeenCalled();
     expect(adminStub.loadStats).toHaveBeenCalledTimes(2); // init + post-unblock refresh
   });
 
-  it('onUnblock() alerts the user when the request fails', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
+  it('onUnblock() shows an error toast when the request fails', async () => {
     adminStub.unblockUser.mockReturnValue(throwError(() => new Error('fail')));
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
     fixture.detectChanges();
 
-    component['onUnblock'](blockedUser);
+    await component['onUnblock'](blockedUser);
 
-    expect(alertSpy).toHaveBeenCalled();
+    expect(uiStub.error).toHaveBeenCalled();
   });
 });

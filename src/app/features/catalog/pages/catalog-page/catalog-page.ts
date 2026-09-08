@@ -5,7 +5,7 @@ import { Book } from '../../../../core/services/book';
 import type { BookItem, BookSearchParams } from '../../../../core/services/book.types';
 import { Loan } from '../../../../core/services/loan';
 import { Reservation } from '../../../../core/services/reservation';
-import { AppHeader } from '../../../../shared/ui/organisms/app-header/app-header';
+import { UiFeedback } from '../../../../core/services/ui-feedback';
 import { BookForm } from '../../components/book-form/book-form';
 import { CatalogSearch } from '../../components/catalog-search/catalog-search';
 import { CatalogTable } from '../../components/catalog-table/catalog-table';
@@ -13,7 +13,7 @@ import { Button } from '../../../../shared/ui/atoms/button/button';
 
 @Component({
   selector: 'app-catalog-page',
-  imports: [AppHeader, CatalogSearch, CatalogTable, BookForm, Button],
+  imports: [CatalogSearch, CatalogTable, BookForm, Button],
   templateUrl: './catalog-page.html',
   styleUrl: './catalog-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,6 +23,7 @@ export class CatalogPage {
   private readonly loanService = inject(Loan);
   private readonly reservationService = inject(Reservation);
   private readonly auth = inject(Auth);
+  private readonly ui = inject(UiFeedback);
 
   protected readonly books = this.bookService.books;
   protected readonly loading = this.bookService.loading;
@@ -46,26 +47,33 @@ export class CatalogPage {
     this.bookService.search(this.currentParams);
   }
 
-  protected onDelete(book: BookItem): void {
-    // window.confirm/alert: pragmático para esta fase — un ConfirmDialog/Toast de PrimeNG
-    // queda como mejora de UI, no cambia la lógica de negocio ni el contrato con la API.
-    if (!window.confirm(`¿Eliminar "${book.title}"? Esta acción no se puede deshacer.`)) {
+  protected async onDelete(book: BookItem): Promise<void> {
+    const confirmed = await this.ui.confirm({
+      message: `¿Eliminar "${book.title}"? Esta acción no se puede deshacer.`,
+      header: 'Eliminar libro',
+      acceptLabel: 'Sí, eliminar',
+      severity: 'danger',
+    });
+    if (!confirmed) {
       return;
     }
     this.bookService.delete(book.id).subscribe({
-      next: () => this.bookService.search(this.currentParams),
-      error: () => window.alert('No se pudo eliminar el libro. Verifica que esté disponible.'),
+      next: () => {
+        this.ui.success(`"${book.title}" fue eliminado del catálogo.`);
+        this.bookService.search(this.currentParams);
+      },
+      error: () => this.ui.error('No se pudo eliminar el libro. Verifica que esté disponible.'),
     });
   }
 
   protected onBorrow(book: BookItem): void {
     this.loanService.create(book.id).subscribe({
       next: () => {
-        window.alert(`"${book.title}" quedó registrado en tus préstamos.`);
+        this.ui.success(`"${book.title}" quedó registrado en tus préstamos.`);
         this.bookService.search(this.currentParams);
       },
       error: (error: HttpErrorResponse) => {
-        window.alert(
+        this.ui.error(
           error.status === 409
             ? 'No se pudo completar el préstamo: el libro ya no está disponible o tu cuenta está bloqueada.'
             : 'No se pudo pedir el préstamo. Intenta de nuevo.',
@@ -76,9 +84,9 @@ export class CatalogPage {
 
   protected onReserve(book: BookItem): void {
     this.reservationService.create(book.id).subscribe({
-      next: () => window.alert(`Quedaste en la fila de espera de "${book.title}". Te avisaremos cuando esté disponible.`),
+      next: () => this.ui.success(`Quedaste en la fila de espera de "${book.title}". Te avisaremos cuando esté disponible.`),
       error: (error: HttpErrorResponse) => {
-        window.alert(
+        this.ui.error(
           error.status === 409
             ? 'No se pudo reservar: el libro está disponible o ya tienes una reserva pendiente para él.'
             : 'No se pudo reservar el libro. Intenta de nuevo.',

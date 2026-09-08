@@ -1,43 +1,27 @@
-<p-table [value]="books()" [loading]="loading()" dataKey="id" [rowTrackBy]="trackById" styleClass="w-full">
-  <ng-template pTemplate="header">
-    <tr>
-      <th>Título</th>
-      <th>Autor</th>
-      <th>ISBN</th>
-      <th>Año</th>
-      <th>Estado</th>
-      <th>Acciones</th>
-    </tr>
+<app-data-table
+  [value]="books()"
+  [columns]="columns"
+  [loading]="loading()"
+  [globalFilterFields]="['title', 'author', 'isbn']"
+  [selectFilter]="statusFilter"
+  searchPlaceholder="Buscar por título, autor o ISBN..."
+  emptyMessage="No hay libros que coincidan con la búsqueda."
+>
+  <ng-template appColumnTemplate="status" let-book>
+    <app-status-badge [status]="book.status" />
   </ng-template>
 
-  <ng-template pTemplate="body" let-book>
-    <tr>
-      <td>{{ book.title }}</td>
-      <td>{{ book.author }}</td>
-      <td>{{ book.isbn }}</td>
-      <td>{{ book.publicationYear ?? '—' }}</td>
-      <td><app-status-badge [status]="book.status" /></td>
-      <td>
-        <div class="flex gap-2">
-          @if (book.status === 'DISPONIBLE') {
-            <app-button label="Pedir préstamo" (click)="borrowBook.emit(book)" class="text-sm" />
-          }
-          @if (book.status === 'PRESTADO') {
-            <app-button label="Reservar" (click)="reserveBook.emit(book)" class="text-sm" />
-          }
-          @if (canManage() && book.status === 'DISPONIBLE') {
-            <app-button label="Eliminar" (click)="deleteBook.emit(book)" class="text-sm" />
-          }
-        </div>
-      </td>
-    </tr>
+  <ng-template appColumnTemplate="actions" let-book>
+    <div class="flex gap-2 flex-wrap">
+      @if (book.status === 'DISPONIBLE') {
+        <app-button label="Pedir préstamo" (click)="borrowBook.emit(book)" class="text-sm" />
+      }
+      @if (book.status === 'PRESTADO') {
+        <app-button label="Reservar" (click)="reserveBook.emit(book)" class="text-sm" />
+      }
+      @if (canManage() && book.status === 'DISPONIBLE') {
+        <app-button label="Eliminar" (click)="deleteBook.emit(book)" class="text-sm" />
+      }
+    </div>
   </ng-template>
-
-  <ng-template pTemplate="emptymessage">
-    <tr>
-      <td colspan="6" class="text-center text-surface-500 py-6">
-        No hay libros que coincidan con la búsqueda.
-      </td>
-    </tr>
-  </ng-template>
-</p-table>
+</app-data-table>
