@@ -86,9 +86,22 @@ describe('AppHeader', () => {
     expect(fixture.nativeElement.textContent).toContain('Administración');
   });
 
-  it('toggles the theme when the theme button is clicked', () => {
-    fixture.nativeElement.querySelectorAll('app-button')[0].dispatchEvent(new Event('click'));
+  it('toggles the theme when the theme icon button is clicked', () => {
+    const toggleButton = fixture.nativeElement.querySelector('button[aria-label*="tema"]') as HTMLButtonElement;
+    toggleButton.dispatchEvent(new Event('click'));
 
     expect(themeStub.toggle).toHaveBeenCalled();
+  });
+
+  it('shows a moon icon in light mode and a sun icon in dark mode', async () => {
+    expect(fixture.nativeElement.querySelector('.pi-moon')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.pi-sun')).toBeNull();
+
+    themeStub.isDark.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('.pi-sun')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.pi-moon')).toBeNull();
   });
 });

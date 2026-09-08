@@ -28,12 +28,14 @@
   </div>
 
   <div class="flex items-center justify-between sm:justify-end gap-3">
-    <app-button
-      [label]="theme.isDark() ? '☀️' : '🌙'"
-      [attr.aria-label]="theme.isDark() ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
+    <button
+      type="button"
       (click)="theme.toggle()"
-      class="shrink-0"
-    />
+      [attr.aria-label]="theme.isDark() ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
+      class="shrink-0 p-2 rounded-full text-surface-500 hover:text-surface-900 hover:bg-surface-100 dark:text-surface-400 dark:hover:text-surface-0 dark:hover:bg-surface-800 transition-colors cursor-pointer"
+    >
+      <i class="pi" [class.pi-sun]="theme.isDark()" [class.pi-moon]="!theme.isDark()"></i>
+    </button>
 
     @if (currentUser(); as user) {
       <p-avatar

@@ -5,17 +5,19 @@ import { Avatar } from 'primeng/avatar';
 import { Menu } from 'primeng/menu';
 import { Auth } from '../../../../core/services/auth';
 import { Theme } from '../../../../core/services/theme';
-import { Button } from '../../atoms/button/button';
 
 /**
  * Barra superior única de la app (vive en `app.html`, ver esa nota). El logo apunta a
  * `public/img/logo.png` (queda servido en `/img/logo.png`) — para cambiarlo alcanza con
  * reemplazar ese archivo, no hace falta tocar este componente. Si no carga (se borró, ruta
  * rota), se oculta solo y el nombre de la app sigue siendo el ancla visual.
+ *
+ * <p>El toggle de tema es un `<button>` nativo con solo un ícono (sin el `Button` atom, que
+ * trae el estilo "pastilla" de PrimeNG) — se pidió que no se vea como botón.</p>
  */
 @Component({
   selector: 'app-header',
-  imports: [Button, RouterLink, RouterLinkActive, Avatar, Menu],
+  imports: [RouterLink, RouterLinkActive, Avatar, Menu],
   templateUrl: './app-header.html',
   styleUrl: './app-header.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
