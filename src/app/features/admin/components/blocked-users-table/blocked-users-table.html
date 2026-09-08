@@ -1,0 +1,15 @@
+<app-data-table
+  [value]="users()"
+  [columns]="columns"
+  [globalFilterFields]="['name', 'email']"
+  searchPlaceholder="Buscar por nombre o correo..."
+  emptyMessage="No hay cuentas bloqueadas."
+>
+  <ng-template appColumnTemplate="blockedUntil" let-user>
+    {{ user.blockedUntil | date: 'short' }}
+  </ng-template>
+
+  <ng-template appColumnTemplate="actions" let-user>
+    <app-button label="Desbloquear" (click)="unblock.emit(user)" class="text-sm" />
+  </ng-template>
+</app-data-table>
