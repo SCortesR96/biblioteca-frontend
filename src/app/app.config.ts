@@ -10,12 +10,8 @@ import Aura from '@primeuix/themes/aura';
 import { routes } from './app.routes';
 import { apiInterceptor } from './core/interceptors/api-interceptor';
 
-/**
- * Aura viene con verde/esmeralda como color primario por defecto — se pidió azul.
- * Se referencian los tokens `{blue.*}` que el propio tema ya trae (no hex fijos): así el
- * contraste en modo oscuro lo sigue resolviendo el sistema de diseño, no un valor pegado
- * a mano que solo se vería bien en un tema.
- */
+// Aura viene en verde por defecto; esto lo cambia a azul usando los tokens {blue.*} del
+// propio tema (no hex fijo), para que el contraste en modo oscuro se siga resolviendo solo.
 const BibliotecaPreset = definePreset(Aura, {
   semantic: {
     primary: {

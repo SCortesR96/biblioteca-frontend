@@ -3,17 +3,9 @@ import { Injectable, signal } from '@angular/core';
 const STORAGE_KEY = 'biblioteca.theme';
 type ThemeMode = 'light' | 'dark';
 
-/**
- * Toggle manual de tema. Antes no existía ninguno: Tailwind aplicaba sus clases `dark:`
- * según `prefers-color-scheme` del sistema operativo (vía el custom variant en
- * `styles.css`), mientras que el tema de PrimeNG solo cambia con la clase `.dark`
- * (`darkModeSelector` en `app.config.ts`) — dos mecanismos independientes que este
- * servicio unifica: ambos ahora dependen exclusivamente de la clase `.dark` en `<html>`,
- * que es lo único que este servicio toca.
- *
- * La preferencia se recuerda en `localStorage`; si no hay ninguna guardada, se arranca
- * respetando la preferencia del sistema operativo (no forzando claro ni oscuro).
- */
+// Toggle de tema: unifica Tailwind (custom variant en styles.css) y PrimeNG
+// (darkModeSelector) bajo la misma clase .dark en <html>. Se recuerda en localStorage;
+// si no hay nada guardado, arranca según la preferencia del sistema.
 @Injectable({
   providedIn: 'root',
 })

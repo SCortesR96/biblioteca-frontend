@@ -8,12 +8,7 @@ import { Button } from '../../../../shared/ui/atoms/button/button';
 import { TextInput } from '../../../../shared/ui/atoms/text-input/text-input';
 import { STATUS_OPTIONS } from './catalog-search.types';
 
-/**
- * Búsqueda reactiva: cada cambio (tipear un título/autor, elegir un estado) dispara la
- * búsqueda solo, sin esperar a un submit — el botón "Buscar" queda como atajo explícito
- * (útil con teclado/Enter), no como el único disparador. El `debounceTime` evita una
- * petición al backend por cada tecla mientras la persona todavía está escribiendo.
- */
+// Búsqueda reactiva: cada cambio dispara sola (debounced), el botón "Buscar" queda como atajo.
 @Component({
   selector: 'app-catalog-search',
   imports: [ReactiveFormsModule, TextInput, Button, Select],

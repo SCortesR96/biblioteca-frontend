@@ -9,19 +9,10 @@ import { TableModule } from 'primeng/table';
 import { ColumnTemplate } from './column-template';
 import type { TableColumn, TableSelectFilter } from './data-table.types';
 
-/**
- * Tabla genérica reutilizada por todas las tablas de la app (catálogo, préstamos,
- * reservas, cuentas bloqueadas, bitácora de errores): un único lugar define el buscador
- * global, el filtro por categoría opcional, el scroll horizontal responsive y el mensaje
- * de "sin resultados" — cada tabla concreta solo aporta sus columnas y, cuando una celda
- * necesita algo más que texto plano (un badge, botones de acción), un
- * `<ng-template appColumnTemplate="campo">` proyectado.
- *
- * El filtro es 100% client-side sobre las filas ya cargadas (vía el propio motor de
- * filtros de `p-table`), independiente de cualquier búsqueda server-side que la página ya
- * tenga (p. ej. el formulario de búsqueda del catálogo): no reemplaza esa búsqueda, la
- * complementa con un filtrado instantáneo sin ida y vuelta al backend.
- */
+// Tabla genérica que reutilizan todas las tablas de la app: buscador, filtro opcional,
+// scroll y "sin resultados" en un solo lugar. Cada tabla concreta solo pone sus columnas
+// y, si una celda necesita más que texto, un <ng-template appColumnTemplate="campo">.
+// El filtro es client-side sobre lo ya cargado, no reemplaza una búsqueda server-side.
 @Component({
   selector: 'app-data-table',
   imports: [TableModule, IconField, InputIcon, InputText, Select, FormsModule, NgTemplateOutlet],

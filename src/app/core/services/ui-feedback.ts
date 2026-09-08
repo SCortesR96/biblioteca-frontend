@@ -10,17 +10,9 @@ export type ConfirmOptions = {
   severity?: 'danger' | 'warn';
 };
 
-/**
- * Envoltorio delgado sobre {@link MessageService}/{@link ConfirmationService} de PrimeNG:
- * ningún componente de página habla con esas dos clases directamente. Centraliza el
- * "look & feel" del feedback (íconos, labels por defecto, severidad) en un solo lugar y
- * hace que los componentes de página sean triviales de testear (un solo servicio para
- * mockear, en vez de dos, y sin depender de `window.alert`/`window.confirm`).
- *
- * `confirm()` devuelve una Promise en vez de aceptar callbacks: permite escribir
- * `if (!(await this.ui.confirm(...))) return;`, el mismo flujo lineal que tenía
- * `window.confirm`, pero con un modal real en vez de un diálogo nativo del navegador.
- */
+// Envuelve MessageService/ConfirmationService de PrimeNG para no repetir la config de
+// íconos/labels en cada componente. confirm() devuelve una Promise para poder escribir
+// `if (!(await ui.confirm(...))) return;`, igual que hacía window.confirm.
 @Injectable({
   providedIn: 'root',
 })

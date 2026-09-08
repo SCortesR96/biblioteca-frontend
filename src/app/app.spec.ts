@@ -28,4 +28,12 @@ describe('App', () => {
     expect(el.querySelector('p-toast')).toBeTruthy();
     expect(el.querySelector('p-confirmdialog')).toBeTruthy();
   });
+
+  it('renders a footer linking to logiczone.dev', () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+
+    const link = fixture.nativeElement.querySelector('footer a') as HTMLAnchorElement;
+    expect(link.href).toBe('https://logiczone.dev/');
+  });
 });
