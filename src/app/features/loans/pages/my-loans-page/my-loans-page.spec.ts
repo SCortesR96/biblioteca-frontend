@@ -12,7 +12,7 @@ import { MyLoansPage } from './my-loans-page';
 const loan: LoanItem = {
   id: 1, bookId: 1, bookTitle: 'Matilda', bookIsbn: '9780140328721', borrowerName: 'Ana',
   borrowerEmail: 'ana@biblioteca.com', loanDate: '2026-01-01', dueDate: '2026-01-15',
-  returnDate: null, overdue: false,
+  returnDate: null, overdue: false, reminderSent: false,
 };
 
 const reservation: ReservationItem = {

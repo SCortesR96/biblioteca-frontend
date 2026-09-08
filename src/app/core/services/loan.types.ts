@@ -9,4 +9,5 @@ export type LoanItem = {
   dueDate: string;
   returnDate: string | null;
   overdue: boolean;
+  reminderSent: boolean;
 };

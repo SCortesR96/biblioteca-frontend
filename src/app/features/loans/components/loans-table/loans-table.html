@@ -18,6 +18,9 @@
       <td>{{ loan.dueDate }}</td>
       <td>
         <app-overdue-badge [returned]="loan.returnDate !== null" [overdue]="loan.overdue" />
+        @if (loan.reminderSent && !loan.returnDate) {
+          <span class="ml-2 text-xs text-surface-500" title="Ya se envió un recordatorio por correo">✉️ recordatorio enviado</span>
+        }
       </td>
       <td>
         @if (!loan.returnDate) {

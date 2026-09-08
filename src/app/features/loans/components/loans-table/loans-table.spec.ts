@@ -6,12 +6,12 @@ const loans: LoanItem[] = [
   {
     id: 1, bookId: 1, bookTitle: 'Matilda', bookIsbn: '9780140328721', borrowerName: 'Ana',
     borrowerEmail: 'ana@biblioteca.com', loanDate: '2026-01-01', dueDate: '2026-01-15',
-    returnDate: null, overdue: false,
+    returnDate: null, overdue: false, reminderSent: false,
   },
   {
     id: 2, bookId: 2, bookTitle: 'El Hobbit', bookIsbn: '9780261102217', borrowerName: 'Ana',
     borrowerEmail: 'ana@biblioteca.com', loanDate: '2025-12-01', dueDate: '2025-12-15',
-    returnDate: '2025-12-20', overdue: false,
+    returnDate: '2025-12-20', overdue: false, reminderSent: false,
   },
 ];
 
@@ -44,5 +44,13 @@ describe('LoansTable', () => {
     fixture.nativeElement.querySelector('app-button').dispatchEvent(new Event('click'));
 
     expect(emitted).toEqual([loans[0]]);
+  });
+
+  it('shows a "recordatorio enviado" hint only for active loans with reminderSent', async () => {
+    fixture.componentRef.setInput('loans', [{ ...loans[0], reminderSent: true }, loans[1]]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.textContent).toContain('recordatorio enviado');
   });
 });
