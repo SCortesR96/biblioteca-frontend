@@ -1,0 +1,15 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4" novalidate>
+  <app-form-field label="Correo" inputId="email" [errorMessage]="emailError()">
+    <app-text-input id="email" type="email" autocomplete="email" formControlName="email" />
+  </app-form-field>
+
+  <app-form-field label="Contraseña" inputId="password" [errorMessage]="passwordError()">
+    <app-text-input id="password" type="password" autocomplete="current-password" formControlName="password" />
+  </app-form-field>
+
+  @if (loginError(); as message) {
+    <p class="text-sm text-red-600" role="alert">{{ message }}</p>
+  }
+
+  <app-button label="Ingresar" type="submit" [loading]="submitting()" />
+</form>

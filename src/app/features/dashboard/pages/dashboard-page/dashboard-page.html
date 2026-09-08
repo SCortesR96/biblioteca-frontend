@@ -1,0 +1,14 @@
+<div class="min-h-screen bg-surface-50 dark:bg-surface-950 p-8">
+  <div class="max-w-md mx-auto bg-white dark:bg-surface-900 rounded-lg shadow-md p-8 flex flex-col gap-4">
+    @if (currentUser(); as user) {
+      <h1 class="text-xl font-semibold text-surface-900 dark:text-surface-0">
+        Hola, {{ user.name }}
+      </h1>
+      <p class="text-sm text-surface-600 dark:text-surface-300">
+        Sesión iniciada como <strong>{{ user.role }}</strong>. El catálogo llega en la
+        siguiente fase.
+      </p>
+    }
+    <app-button label="Cerrar sesión" (click)="logout()" />
+  </div>
+</div>
