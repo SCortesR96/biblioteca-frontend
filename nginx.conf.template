@@ -11,17 +11,17 @@ server {
     }
 
     # El frontend en producción habla con /api (ver environment.ts); nginx reenvía al
-    # backend dentro de la red de Docker Compose, evitando problemas de CORS.
+    # backend, evitando que el navegador tenga que lidiar con CORS (la llamada real
+    # cruza orígenes servidor-a-servidor, no desde el browser).
     #
-    # "backend" se resuelve vía el DNS embebido de Docker (127.0.0.11) usando una
-    # variable en proxy_pass en vez de un upstream fijo: así nginx re-resuelve el
-    # nombre en cada request (cache de 10s) en lugar de solo al arrancar. Con un
-    # upstream estático, si este contenedor arranca antes que el backend (o el
-    # backend se reinicia y cambia de IP), nginx directamente rehúsa levantar.
+    # BACKEND_URL se resuelve en el arranque del contenedor (envsubst sobre este
+    # template, ver Dockerfile) — por defecto apunta al nombre de servicio de Docker
+    # Compose (http://backend:8080), pero en un despliegue donde front y back son dos
+    # apps separadas (Dokploy, etc.) se pisa con la URL real del backend.
     resolver 127.0.0.11 valid=10s;
 
     location /api/ {
-        set $backend_upstream http://backend:8080;
+        set $backend_upstream ${BACKEND_URL};
         # $request_uri (no $uri): la URI original completa tal como llegó del cliente,
         # sin normalizar. Con una variable en proxy_pass, nginx NO hace el
         # location-prefix-stripping automático que sí hace con una cadena fija — un sufijo

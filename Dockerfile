@@ -24,6 +24,15 @@ CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--port", "80", "--poll", "1000"
 # ---- Etapa de servido ----
 FROM nginx:1.27-alpine
 COPY --from=build /app/dist/frontend/browser /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# La imagen oficial de nginx procesa con envsubst cualquier *.template en
+# /etc/nginx/templates/ al arrancar el contenedor, generando el .conf real en
+# /etc/nginx/conf.d/ — así BACKEND_URL se resuelve en runtime, no en build. El filtro
+# restringe la sustitución a esa sola variable: sin él, envsubst también intentaría
+# reemplazar los $host/$scheme/etc. propios de nginx (que no son variables de entorno)
+# y los dejaría vacíos, rompiendo el proxy.
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+ENV BACKEND_URL=http://backend:8080
+ENV NGINX_ENVSUBST_FILTER=BACKEND_URL
 
 EXPOSE 80
