@@ -33,7 +33,12 @@ server {
         # (Traefik, en un despliegue con front y back como apps separadas) no sabe a qué
         # servicio dirigir la conexión y la rechaza (bug real, encontrado en producción).
         proxy_ssl_server_name on;
-        proxy_set_header Host $host;
+        # $proxy_host (el host:puerto de BACKEND_URL), no $host (el Host original del
+        # navegador, biblioteca.logiczone.dev): un router que enruta por Host además de
+        # por SNI necesita que ambos coincidan con el destino real, o puede terminar
+        # reenviando la petición a otro sitio (bug real, encontrado en producción — un
+        # Host desalineado del SNI producía un loop que Cloudflare cortaba con un 403).
+        proxy_set_header Host $proxy_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
