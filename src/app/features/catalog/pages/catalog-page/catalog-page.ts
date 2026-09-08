@@ -66,7 +66,16 @@ export class CatalogPage {
     });
   }
 
-  protected onBorrow(book: BookItem): void {
+  protected async onBorrow(book: BookItem): Promise<void> {
+    const confirmed = await this.ui.confirm({
+      message: `¿Pedir prestado "${book.title}"?`,
+      header: 'Confirmar préstamo',
+      acceptLabel: 'Sí, pedir prestado',
+      severity: 'warn',
+    });
+    if (!confirmed) {
+      return;
+    }
     this.loanService.create(book.id).subscribe({
       next: () => {
         this.ui.success(`"${book.title}" quedó registrado en tus préstamos.`);
@@ -82,7 +91,16 @@ export class CatalogPage {
     });
   }
 
-  protected onReserve(book: BookItem): void {
+  protected async onReserve(book: BookItem): Promise<void> {
+    const confirmed = await this.ui.confirm({
+      message: `¿Reservar "${book.title}"? Quedarás en la fila de espera y te avisaremos cuando esté disponible.`,
+      header: 'Confirmar reserva',
+      acceptLabel: 'Sí, reservar',
+      severity: 'warn',
+    });
+    if (!confirmed) {
+      return;
+    }
     this.reservationService.create(book.id).subscribe({
       next: () => this.ui.success(`Quedaste en la fila de espera de "${book.title}". Te avisaremos cuando esté disponible.`),
       error: (error: HttpErrorResponse) => {

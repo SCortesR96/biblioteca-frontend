@@ -32,12 +32,22 @@
       [dataKey]="dataKey()"
       [rowTrackBy]="trackByRow"
       [globalFilterFields]="globalFilterFields()"
+      [filterDelay]="filterDelay()"
+      [scrollable]="true"
+      [scrollHeight]="scrollHeight()"
       styleClass="w-full min-w-[640px]"
     >
       <ng-template pTemplate="header">
         <tr>
           @for (col of columns(); track col.field) {
-            <th [class]="col.class">{{ col.header }}</th>
+            @if (col.sortable) {
+              <th [class]="col.class" [pSortableColumn]="col.field">
+                {{ col.header }}
+                <p-sortIcon [field]="col.field" />
+              </th>
+            } @else {
+              <th [class]="col.class">{{ col.header }}</th>
+            }
           }
         </tr>
       </ng-template>

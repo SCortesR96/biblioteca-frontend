@@ -33,4 +33,16 @@ describe('CatalogSearch', () => {
 
     expect(emitted[0].status).toBe('DISPONIBLE');
   });
+
+  it('emits automatically (debounced) when a field changes, without needing submit', async () => {
+    const emitted: BookSearchParams[] = [];
+    component.search.subscribe((params) => emitted.push(params));
+
+    component['form'].controls.title.setValue('Hobbit');
+    expect(emitted).toEqual([]); // todavía no, está debounced
+
+    await new Promise((resolve) => setTimeout(resolve, 350));
+
+    expect(emitted).toEqual([{ title: 'Hobbit', author: undefined, status: undefined }]);
+  });
 });

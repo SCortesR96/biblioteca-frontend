@@ -12,7 +12,7 @@ const rows: Row[] = [
 ];
 
 const columns: TableColumn[] = [
-  { field: 'name', header: 'Nombre' },
+  { field: 'name', header: 'Nombre', sortable: true },
   { field: 'status', header: 'Estado' },
 ];
 
@@ -85,13 +85,24 @@ describe('DataTable', () => {
     input.value = 'hobbit';
     input.dispatchEvent(new Event('input'));
     fixture.detectChanges();
-    // p-table debounce su filtro global con un setTimeout (filterDelay, 300ms por
-    // defecto) — no es un microtask, así que whenStable() no alcanza a esperarlo.
-    await new Promise((resolve) => setTimeout(resolve, 350));
+    // p-table debounce su filtro global con un setTimeout (filterDelay) — no es un
+    // microtask, así que whenStable() no alcanza a esperarlo.
+    await new Promise((resolve) => setTimeout(resolve, 200));
     fixture.detectChanges();
 
     const bodyText = fixture.nativeElement.querySelector('tbody').textContent as string;
     expect(bodyText).toContain('El Hobbit');
     expect(bodyText).not.toContain('Matilda');
+  });
+
+  it('marks only columns declared as sortable with a clickable header', () => {
+    const headers = fixture.nativeElement.querySelectorAll('th');
+    expect(headers[0].querySelector('p-sorticon')).toBeTruthy(); // "name": sortable: true
+    expect(headers[1].querySelector('p-sorticon')).toBeNull(); // "status": sortable not set
+  });
+
+  it('renders the table scrollable so long lists get a vertical scrollbar instead of growing the page', () => {
+    const scroller = fixture.nativeElement.querySelector('.p-datatable-scrollable, .p-datatable-wrapper');
+    expect(scroller).toBeTruthy();
   });
 });

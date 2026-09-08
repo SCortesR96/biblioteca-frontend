@@ -38,6 +38,10 @@ export class DataTable<T> {
   readonly searchPlaceholder = input('Buscar...');
   readonly selectFilter = input<TableSelectFilter | null>(null);
   readonly emptyMessage = input('Sin resultados.');
+  /** Debounce del filtro global, en ms. Bajo a propósito: se pidió que se sienta "en tiempo real". */
+  readonly filterDelay = input(100);
+  /** Alto máximo del cuerpo de la tabla antes de scrollear verticalmente (header queda fijo). */
+  readonly scrollHeight = input('28rem');
 
   private readonly columnTemplates = contentChildren(ColumnTemplate);
 

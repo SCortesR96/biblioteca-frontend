@@ -2,21 +2,28 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { signal } from '@angular/core';
 import { Auth } from '../../../../core/services/auth';
+import { Theme } from '../../../../core/services/theme';
 import { AppHeader } from './app-header';
 
 describe('AppHeader', () => {
   let fixture: ComponentFixture<AppHeader>;
   let authStub: { currentUser: ReturnType<typeof signal>; logout: ReturnType<typeof vi.fn> };
+  let themeStub: { isDark: ReturnType<typeof signal>; toggle: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     authStub = {
-      currentUser: signal({ name: 'Ana', email: 'ana@biblioteca.com', role: 'BIBLIOTECARIO' }),
+      currentUser: signal({ name: 'Ana Torres', email: 'ana@biblioteca.com', role: 'BIBLIOTECARIO' }),
       logout: vi.fn(),
     };
+    themeStub = { isDark: signal(false), toggle: vi.fn() };
 
     await TestBed.configureTestingModule({
       imports: [AppHeader],
-      providers: [provideRouter([]), { provide: Auth, useValue: authStub }],
+      providers: [
+        provideRouter([]),
+        { provide: Auth, useValue: authStub },
+        { provide: Theme, useValue: themeStub },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppHeader);
@@ -24,28 +31,34 @@ describe('AppHeader', () => {
     await fixture.whenStable();
   });
 
-  it('shows the current user name and role', () => {
-    const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('Ana');
-    expect(text).toContain('BIBLIOTECARIO');
+  it('shows the avatar with the user initials when there is a session', () => {
+    expect(fixture.nativeElement.querySelector('p-avatar')).toBeTruthy();
+    expect(fixture.nativeElement.textContent).toContain('AT');
   });
 
-  it('logs out and navigates to /login on click', () => {
+  it('logs out and navigates to /login when the menu item is activated', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigateByUrl');
 
-    fixture.nativeElement.querySelector('app-button').dispatchEvent(new Event('click'));
+    fixture.componentInstance['logout']();
 
     expect(authStub.logout).toHaveBeenCalled();
     expect(navigateSpy).toHaveBeenCalledWith('/login');
   });
 
-  it('hides the user block when there is no session', async () => {
+  it('the user menu model includes the name/role header and a logout item', () => {
+    const items = fixture.componentInstance['userMenuItems']();
+    expect(items[0].label).toBe('Ana Torres · BIBLIOTECARIO');
+    expect(items[0].disabled).toBe(true);
+    expect(items.at(-1)!.label).toBe('Cerrar sesión');
+  });
+
+  it('hides the avatar when there is no session', async () => {
     authStub.currentUser.set(null);
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(fixture.nativeElement.querySelector('app-button')).toBeNull();
+    expect(fixture.nativeElement.querySelector('p-avatar')).toBeNull();
   });
 
   it('shows navigation links to the catalog and "Mis préstamos" when there is a session', () => {
@@ -71,5 +84,11 @@ describe('AppHeader', () => {
     await fixture.whenStable();
 
     expect(fixture.nativeElement.textContent).toContain('Administración');
+  });
+
+  it('toggles the theme when the theme button is clicked', () => {
+    fixture.nativeElement.querySelectorAll('app-button')[0].dispatchEvent(new Event('click'));
+
+    expect(themeStub.toggle).toHaveBeenCalled();
   });
 });

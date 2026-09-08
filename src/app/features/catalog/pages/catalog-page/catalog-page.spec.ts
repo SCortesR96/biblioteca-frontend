@@ -106,41 +106,61 @@ describe('CatalogPage', () => {
     expect(fixture.nativeElement.textContent).not.toContain('Registrar libro');
   });
 
-  it('onBorrow() creates the loan, notifies the user and refreshes the catalog', () => {
+  it('onBorrow() asks for confirmation before creating the loan', async () => {
+    uiStub.confirm.mockResolvedValue(false);
+    fixture.detectChanges();
+
+    await component['onBorrow'](book);
+
+    expect(uiStub.confirm).toHaveBeenCalledWith(expect.objectContaining({ severity: 'warn' }));
+    expect(loanStub.create).not.toHaveBeenCalled();
+  });
+
+  it('onBorrow() creates the loan, notifies the user and refreshes the catalog when confirmed', async () => {
     loanStub.create.mockReturnValue(of({ id: 1 }));
     fixture.detectChanges();
 
-    component['onBorrow'](book);
+    await component['onBorrow'](book);
 
     expect(loanStub.create).toHaveBeenCalledWith(1);
     expect(uiStub.success).toHaveBeenCalled();
     expect(bookStub.search).toHaveBeenCalledTimes(2); // init + post-borrow refresh
   });
 
-  it('onBorrow() shows a specific message on 409 (no disponible / cuenta bloqueada)', () => {
+  it('onBorrow() shows a specific message on 409 (no disponible / cuenta bloqueada)', async () => {
     loanStub.create.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 409 })));
     fixture.detectChanges();
 
-    component['onBorrow'](book);
+    await component['onBorrow'](book);
 
     expect(uiStub.error).toHaveBeenCalledWith(expect.stringContaining('no está disponible'));
   });
 
-  it('onReserve() creates the reservation and notifies the user', () => {
+  it('onReserve() asks for confirmation before creating the reservation', async () => {
+    uiStub.confirm.mockResolvedValue(false);
+    fixture.detectChanges();
+
+    await component['onReserve'](book);
+
+    expect(uiStub.confirm).toHaveBeenCalledWith(expect.objectContaining({ severity: 'warn' }));
+    expect(reservationStub.create).not.toHaveBeenCalled();
+  });
+
+  it('onReserve() creates the reservation and notifies the user when confirmed', async () => {
     reservationStub.create.mockReturnValue(of({ id: 1 }));
     fixture.detectChanges();
 
-    component['onReserve'](book);
+    await component['onReserve'](book);
 
     expect(reservationStub.create).toHaveBeenCalledWith(1);
     expect(uiStub.success).toHaveBeenCalledWith(expect.stringContaining('fila de espera'));
   });
 
-  it('onReserve() shows a specific message on 409', () => {
+  it('onReserve() shows a specific message on 409', async () => {
     reservationStub.create.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 409 })));
     fixture.detectChanges();
 
-    component['onReserve'](book);
+    await component['onReserve'](book);
 
     expect(uiStub.error).toHaveBeenCalledWith(expect.stringContaining('ya tienes una reserva pendiente'));
   });

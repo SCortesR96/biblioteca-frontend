@@ -64,21 +64,31 @@ describe('MyLoansPage', () => {
     expect(reservationStub.loadMine).toHaveBeenCalled();
   });
 
-  it('onReturn() calls Loan.returnLoan with the loan id and shows a success toast', () => {
+  it('onReturn() asks for confirmation before returning', async () => {
+    uiStub.confirm.mockResolvedValue(false);
+    fixture.detectChanges();
+
+    await component['onReturn'](loan);
+
+    expect(uiStub.confirm).toHaveBeenCalledWith(expect.objectContaining({ severity: 'warn' }));
+    expect(loanStub.returnLoan).not.toHaveBeenCalled();
+  });
+
+  it('onReturn() calls Loan.returnLoan with the loan id and shows a success toast when confirmed', async () => {
     loanStub.returnLoan.mockReturnValue(of(loan));
     fixture.detectChanges();
 
-    component['onReturn'](loan);
+    await component['onReturn'](loan);
 
     expect(loanStub.returnLoan).toHaveBeenCalledWith(1);
     expect(uiStub.success).toHaveBeenCalled();
   });
 
-  it('onReturn() shows an error toast when the return fails', () => {
+  it('onReturn() shows an error toast when the return fails', async () => {
     loanStub.returnLoan.mockReturnValue(throwError(() => new Error('fail')));
     fixture.detectChanges();
 
-    component['onReturn'](loan);
+    await component['onReturn'](loan);
 
     expect(uiStub.error).toHaveBeenCalled();
   });

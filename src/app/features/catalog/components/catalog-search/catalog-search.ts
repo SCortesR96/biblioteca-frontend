@@ -1,11 +1,19 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import type { BookSearchParams, BookStatus } from '../../../../core/services/book.types';
 import { Button } from '../../../../shared/ui/atoms/button/button';
 import { TextInput } from '../../../../shared/ui/atoms/text-input/text-input';
 import { STATUS_OPTIONS } from './catalog-search.types';
 
+/**
+ * Búsqueda reactiva: cada cambio (tipear un título/autor, elegir un estado) dispara la
+ * búsqueda solo, sin esperar a un submit — el botón "Buscar" queda como atajo explícito
+ * (útil con teclado/Enter), no como el único disparador. El `debounceTime` evita una
+ * petición al backend por cada tecla mientras la persona todavía está escribiendo.
+ */
 @Component({
   selector: 'app-catalog-search',
   imports: [ReactiveFormsModule, TextInput, Button, Select],
@@ -23,6 +31,12 @@ export class CatalogSearch {
     author: new FormControl('', { nonNullable: true }),
     status: new FormControl<BookStatus | null>(null),
   });
+
+  constructor() {
+    this.form.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)), takeUntilDestroyed())
+      .subscribe(() => this.submit());
+  }
 
   protected submit(): void {
     const { title, author, status } = this.form.getRawValue();

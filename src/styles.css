@@ -3,3 +3,9 @@
 @import 'tailwindcss';
 @import 'primeicons/primeicons.css';
 @plugin 'tailwindcss-primeui';
+
+/* Sin esto, las clases dark: de Tailwind siguen prefers-color-scheme del sistema
+   operativo — desacopladas del darkModeSelector ('.dark') que ya usa el tema de PrimeNG
+   en app.config.ts. Con esto, un único interruptor (la clase .dark en <html>, controlada
+   por core/services/theme.ts) gobierna ambos a la vez. */
+@custom-variant dark (&:where(.dark, .dark *));

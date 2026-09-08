@@ -7,11 +7,11 @@ import { Button } from '../../../../shared/ui/atoms/button/button';
 import { StatusBadge } from '../../../../shared/ui/atoms/status-badge/status-badge';
 
 const COLUMNS: TableColumn[] = [
-  { field: 'title', header: 'Título' },
-  { field: 'author', header: 'Autor', class: 'hidden sm:table-cell' },
-  { field: 'isbn', header: 'ISBN', class: 'hidden md:table-cell' },
-  { field: 'publicationYear', header: 'Año', class: 'hidden md:table-cell' },
-  { field: 'status', header: 'Estado' },
+  { field: 'title', header: 'Título', sortable: true },
+  { field: 'author', header: 'Autor', class: 'hidden sm:table-cell', sortable: true },
+  { field: 'isbn', header: 'ISBN', class: 'hidden md:table-cell', sortable: true },
+  { field: 'publicationYear', header: 'Año', class: 'hidden md:table-cell', sortable: true },
+  { field: 'status', header: 'Estado', sortable: true },
   { field: 'actions', header: 'Acciones' },
 ];
 

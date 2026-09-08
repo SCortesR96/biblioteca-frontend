@@ -32,7 +32,16 @@ export class MyLoansPage {
     this.reservationService.loadMine();
   }
 
-  protected onReturn(loan: LoanItem): void {
+  protected async onReturn(loan: LoanItem): Promise<void> {
+    const confirmed = await this.ui.confirm({
+      message: `¿Confirmas la devolución de "${loan.bookTitle}"?`,
+      header: 'Confirmar devolución',
+      acceptLabel: 'Sí, devolver',
+      severity: 'warn',
+    });
+    if (!confirmed) {
+      return;
+    }
     this.loanService.returnLoan(loan.id).subscribe({
       next: () => this.ui.success(`"${loan.bookTitle}" quedó registrado como devuelto.`),
       error: () => this.ui.error('No se pudo devolver el préstamo. Intenta de nuevo.'),

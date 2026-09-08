@@ -8,10 +8,10 @@ import { DataTable } from '../../../../shared/ui/organisms/data-table/data-table
 import type { TableColumn, TableSelectFilter } from '../../../../shared/ui/organisms/data-table/data-table.types';
 
 const COLUMNS: TableColumn[] = [
-  { field: 'bookTitle', header: 'Libro' },
-  { field: 'bookIsbn', header: 'ISBN', class: 'hidden sm:table-cell' },
-  { field: 'requestDate', header: 'Solicitada', class: 'hidden md:table-cell' },
-  { field: 'status', header: 'Estado' },
+  { field: 'bookTitle', header: 'Libro', sortable: true },
+  { field: 'bookIsbn', header: 'ISBN', class: 'hidden sm:table-cell', sortable: true },
+  { field: 'requestDate', header: 'Solicitada', class: 'hidden md:table-cell', sortable: true },
+  { field: 'status', header: 'Estado', sortable: true },
   { field: 'actions', header: 'Acciones' },
 ];
 

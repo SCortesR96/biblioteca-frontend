@@ -13,11 +13,11 @@ const LEVEL_SEVERITIES: Record<LogLevel, 'info' | 'warn' | 'danger'> = {
 };
 
 const COLUMNS: TableColumn[] = [
-  { field: 'level', header: 'Nivel' },
-  { field: 'message', header: 'Mensaje' },
-  { field: 'exceptionType', header: 'Excepción', class: 'hidden md:table-cell text-xs text-surface-500' },
+  { field: 'level', header: 'Nivel', sortable: true },
+  { field: 'message', header: 'Mensaje', sortable: true },
+  { field: 'exceptionType', header: 'Excepción', class: 'hidden md:table-cell text-xs text-surface-500', sortable: true },
   { field: 'path', header: 'Ruta', class: 'hidden lg:table-cell' },
-  { field: 'createdAt', header: 'Fecha' },
+  { field: 'createdAt', header: 'Fecha', sortable: true },
 ];
 
 const LEVEL_FILTER: TableSelectFilter = {

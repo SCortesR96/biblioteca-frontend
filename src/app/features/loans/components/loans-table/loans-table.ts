@@ -7,10 +7,10 @@ import { DataTable } from '../../../../shared/ui/organisms/data-table/data-table
 import type { TableColumn } from '../../../../shared/ui/organisms/data-table/data-table.types';
 
 const COLUMNS: TableColumn[] = [
-  { field: 'bookTitle', header: 'Libro' },
-  { field: 'bookIsbn', header: 'ISBN', class: 'hidden sm:table-cell' },
-  { field: 'loanDate', header: 'Fecha de préstamo', class: 'hidden md:table-cell' },
-  { field: 'dueDate', header: 'Fecha límite' },
+  { field: 'bookTitle', header: 'Libro', sortable: true },
+  { field: 'bookIsbn', header: 'ISBN', class: 'hidden sm:table-cell', sortable: true },
+  { field: 'loanDate', header: 'Fecha de préstamo', class: 'hidden md:table-cell', sortable: true },
+  { field: 'dueDate', header: 'Fecha límite', sortable: true },
   { field: 'estado', header: 'Estado' },
   { field: 'actions', header: 'Acciones' },
 ];
