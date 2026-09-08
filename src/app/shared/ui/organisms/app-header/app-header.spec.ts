@@ -65,7 +65,7 @@ describe('AppHeader', () => {
     const links = fixture.nativeElement.querySelectorAll('nav a');
     const hrefs = Array.from(links).map((a) => (a as HTMLAnchorElement).getAttribute('href'));
     expect(hrefs).toContain('/');
-    expect(hrefs).toContain('/mis-prestamos');
+    expect(hrefs).toContain('/my-loans');
   });
 
   it('hides navigation when there is no session', async () => {
