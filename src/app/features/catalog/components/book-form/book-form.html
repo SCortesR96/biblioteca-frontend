@@ -1,0 +1,38 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4" novalidate>
+  <div class="flex items-end gap-2">
+    <div class="flex-1">
+      <app-form-field label="ISBN" inputId="isbn">
+        <app-text-input id="isbn" formControlName="isbn" placeholder="Ej: 9780140328721" />
+      </app-form-field>
+    </div>
+    <app-button
+      label="Autocompletar desde ISBN"
+      type="button"
+      [loading]="lookingUp()"
+      (click)="autocomplete()"
+      class="mb-1"
+    />
+  </div>
+
+  @if (lookupMessage(); as message) {
+    <p class="text-sm text-surface-600 dark:text-surface-300">{{ message }}</p>
+  }
+
+  <app-form-field label="Título" inputId="title">
+    <app-text-input id="title" formControlName="title" />
+  </app-form-field>
+
+  <app-form-field label="Autor" inputId="author">
+    <app-text-input id="author" formControlName="author" />
+  </app-form-field>
+
+  <app-form-field label="Año de publicación" inputId="publicationYear">
+    <app-text-input id="publicationYear" formControlName="publicationYear" type="text" />
+  </app-form-field>
+
+  @if (submitError(); as message) {
+    <p class="text-sm text-red-600" role="alert">{{ message }}</p>
+  }
+
+  <app-button label="Guardar libro" type="submit" [loading]="submitting()" class="w-full" />
+</form>

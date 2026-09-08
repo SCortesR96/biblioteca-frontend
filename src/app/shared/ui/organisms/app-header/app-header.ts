@@ -1,21 +1,16 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Auth } from '../../../../core/services/auth';
-import { Button } from '../../../../shared/ui/atoms/button/button';
+import { Button } from '../../atoms/button/button';
 
-/**
- * Landing autenticado temporal: confirma que el login/JWT/guard funcionan de punta a
- * punta. Se reemplaza por el catálogo real en la fase 2 (probablemente movido a otra
- * ruta si conviene mantener un dashboard aparte).
- */
 @Component({
-  selector: 'app-dashboard-page',
+  selector: 'app-header',
   imports: [Button],
-  templateUrl: './dashboard-page.html',
-  styleUrl: './dashboard-page.css',
+  templateUrl: './app-header.html',
+  styleUrl: './app-header.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardPage {
+export class AppHeader {
   private readonly auth = inject(Auth);
   private readonly router = inject(Router);
 

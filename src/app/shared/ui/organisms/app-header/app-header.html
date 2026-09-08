@@ -1,0 +1,12 @@
+<header class="flex items-center justify-between bg-white dark:bg-surface-900 shadow-sm px-6 py-4">
+  <h1 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Biblioteca</h1>
+
+  @if (currentUser(); as user) {
+    <div class="flex items-center gap-4">
+      <span class="text-sm text-surface-600 dark:text-surface-300">
+        {{ user.name }} · {{ user.role }}
+      </span>
+      <app-button label="Cerrar sesión" (click)="logout()" />
+    </div>
+  }
+</header>

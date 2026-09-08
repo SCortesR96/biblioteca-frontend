@@ -1,0 +1,34 @@
+<app-header />
+
+<div class="max-w-6xl mx-auto p-6 flex flex-col gap-6">
+  @if (isAdmin()) {
+    <div class="bg-white dark:bg-surface-900 rounded-lg shadow-sm p-4">
+      <app-button
+        [label]="showForm() ? 'Cancelar' : 'Registrar libro'"
+        (click)="showForm.set(!showForm())"
+        class="w-auto"
+      />
+
+      @if (showForm()) {
+        <div class="mt-4">
+          <app-book-form (created)="onBookCreated()" />
+        </div>
+      }
+    </div>
+  }
+
+  <div class="bg-white dark:bg-surface-900 rounded-lg shadow-sm p-4">
+    <app-catalog-search (search)="onSearch($event)" />
+
+    @if (error(); as message) {
+      <p class="text-sm text-red-600 mb-3" role="alert">{{ message }}</p>
+    }
+
+    <app-catalog-table
+      [books]="books()"
+      [loading]="loading()"
+      [canManage]="isAdmin()"
+      (deleteBook)="onDelete($event)"
+    />
+  </div>
+</div>

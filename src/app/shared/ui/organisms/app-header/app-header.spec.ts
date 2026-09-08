@@ -2,11 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { signal } from '@angular/core';
 import { Auth } from '../../../../core/services/auth';
-import { DashboardPage } from './dashboard-page';
+import { AppHeader } from './app-header';
 
-describe('DashboardPage', () => {
-  let component: DashboardPage;
-  let fixture: ComponentFixture<DashboardPage>;
+describe('AppHeader', () => {
+  let fixture: ComponentFixture<AppHeader>;
   let authStub: { currentUser: ReturnType<typeof signal>; logout: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
@@ -16,27 +15,22 @@ describe('DashboardPage', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [DashboardPage],
+      imports: [AppHeader],
       providers: [provideRouter([]), { provide: Auth, useValue: authStub }],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DashboardPage);
-    component = fixture.componentInstance;
+    fixture = TestBed.createComponent(AppHeader);
     fixture.detectChanges();
     await fixture.whenStable();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('greets the current user by name and shows their role', () => {
+  it('shows the current user name and role', () => {
     const text = fixture.nativeElement.textContent as string;
     expect(text).toContain('Ana');
     expect(text).toContain('BIBLIOTECARIO');
   });
 
-  it('logs out and navigates to /login when the logout button is clicked', () => {
+  it('logs out and navigates to /login on click', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigateByUrl');
 
@@ -44,5 +38,13 @@ describe('DashboardPage', () => {
 
     expect(authStub.logout).toHaveBeenCalled();
     expect(navigateSpy).toHaveBeenCalledWith('/login');
+  });
+
+  it('hides the user block when there is no session', async () => {
+    authStub.currentUser.set(null);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('app-button')).toBeNull();
   });
 });

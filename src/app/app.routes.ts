@@ -10,7 +10,7 @@ export const routes: Routes = [
     path: '',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/dashboard/pages/dashboard-page/dashboard-page').then((m) => m.DashboardPage),
+      import('./features/catalog/pages/catalog-page/catalog-page').then((m) => m.CatalogPage),
   },
   { path: '**', redirectTo: '' },
 ];
