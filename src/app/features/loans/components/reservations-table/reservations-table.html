@@ -1,0 +1,31 @@
+<p-table [value]="reservations()" [loading]="loading()" dataKey="id" [rowTrackBy]="trackById" styleClass="w-full">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Libro</th>
+      <th>ISBN</th>
+      <th>Solicitada</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-reservation>
+    <tr>
+      <td>{{ reservation.bookTitle }}</td>
+      <td>{{ reservation.bookIsbn }}</td>
+      <td>{{ reservation.requestDate | date: 'short' }}</td>
+      <td><p-tag [value]="reservation.status" /></td>
+      <td>
+        @if (reservation.status === 'PENDIENTE' || reservation.status === 'NOTIFICADO') {
+          <app-button label="Cancelar" (click)="cancelReservation.emit(reservation)" class="text-sm" />
+        }
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="5" class="text-center text-surface-500 py-6">No tienes reservas.</td>
+    </tr>
+  </ng-template>
+</p-table>

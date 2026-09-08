@@ -1,13 +1,31 @@
 <app-header />
 
-<div class="max-w-6xl mx-auto p-6 flex flex-col gap-4">
-  <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Mis préstamos</h2>
+<div class="max-w-6xl mx-auto p-6 flex flex-col gap-6">
+  <div class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Mis préstamos</h2>
 
-  @if (error(); as message) {
-    <p class="text-sm text-red-600" role="alert">{{ message }}</p>
-  }
+    @if (loansError(); as message) {
+      <p class="text-sm text-red-600" role="alert">{{ message }}</p>
+    }
 
-  <div class="bg-white dark:bg-surface-900 rounded-lg shadow-sm p-4">
-    <app-loans-table [loans]="loans()" [loading]="loading()" (returnLoan)="onReturn($event)" />
+    <div class="bg-white dark:bg-surface-900 rounded-lg shadow-sm p-4">
+      <app-loans-table [loans]="loans()" [loading]="loansLoading()" (returnLoan)="onReturn($event)" />
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Mis reservas</h2>
+
+    @if (reservationsError(); as message) {
+      <p class="text-sm text-red-600" role="alert">{{ message }}</p>
+    }
+
+    <div class="bg-white dark:bg-surface-900 rounded-lg shadow-sm p-4">
+      <app-reservations-table
+        [reservations]="reservations()"
+        [loading]="reservationsLoading()"
+        (cancelReservation)="onCancelReservation($event)"
+      />
+    </div>
   </div>
 </div>

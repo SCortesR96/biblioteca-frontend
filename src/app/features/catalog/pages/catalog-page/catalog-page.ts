@@ -4,6 +4,7 @@ import { Auth } from '../../../../core/services/auth';
 import { Book } from '../../../../core/services/book';
 import type { BookItem, BookSearchParams } from '../../../../core/services/book.types';
 import { Loan } from '../../../../core/services/loan';
+import { Reservation } from '../../../../core/services/reservation';
 import { AppHeader } from '../../../../shared/ui/organisms/app-header/app-header';
 import { BookForm } from '../../components/book-form/book-form';
 import { CatalogSearch } from '../../components/catalog-search/catalog-search';
@@ -20,6 +21,7 @@ import { Button } from '../../../../shared/ui/atoms/button/button';
 export class CatalogPage {
   private readonly bookService = inject(Book);
   private readonly loanService = inject(Loan);
+  private readonly reservationService = inject(Reservation);
   private readonly auth = inject(Auth);
 
   protected readonly books = this.bookService.books;
@@ -67,6 +69,19 @@ export class CatalogPage {
           error.status === 409
             ? 'No se pudo completar el préstamo: el libro ya no está disponible o tu cuenta está bloqueada.'
             : 'No se pudo pedir el préstamo. Intenta de nuevo.',
+        );
+      },
+    });
+  }
+
+  protected onReserve(book: BookItem): void {
+    this.reservationService.create(book.id).subscribe({
+      next: () => window.alert(`Quedaste en la fila de espera de "${book.title}". Te avisaremos cuando esté disponible.`),
+      error: (error: HttpErrorResponse) => {
+        window.alert(
+          error.status === 409
+            ? 'No se pudo reservar: el libro está disponible o ya tienes una reserva pendiente para él.'
+            : 'No se pudo reservar el libro. Intenta de nuevo.',
         );
       },
     });

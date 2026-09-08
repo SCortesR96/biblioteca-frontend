@@ -22,6 +22,9 @@
           @if (book.status === 'DISPONIBLE') {
             <app-button label="Pedir préstamo" (click)="borrowBook.emit(book)" class="text-sm" />
           }
+          @if (book.status === 'PRESTADO') {
+            <app-button label="Reservar" (click)="reserveBook.emit(book)" class="text-sm" />
+          }
           @if (canManage() && book.status === 'DISPONIBLE') {
             <app-button label="Eliminar" (click)="deleteBook.emit(book)" class="text-sm" />
           }

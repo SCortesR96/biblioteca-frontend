@@ -7,6 +7,7 @@ import { Auth } from '../../../../core/services/auth';
 import { Book } from '../../../../core/services/book';
 import type { BookItem } from '../../../../core/services/book.types';
 import { Loan } from '../../../../core/services/loan';
+import { Reservation } from '../../../../core/services/reservation';
 import { CatalogPage } from './catalog-page';
 
 const book: BookItem = {
@@ -23,6 +24,7 @@ describe('CatalogPage', () => {
   };
   let authStub: { isAdmin: ReturnType<typeof signal>; currentUser: ReturnType<typeof signal> };
   let loanStub: { create: ReturnType<typeof vi.fn> };
+  let reservationStub: { create: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     bookStub = {
@@ -31,6 +33,7 @@ describe('CatalogPage', () => {
     };
     authStub = { isAdmin: signal(true), currentUser: signal({ name: 'Ana', email: 'a@a.com', role: 'ADMIN' }) };
     loanStub = { create: vi.fn() };
+    reservationStub = { create: vi.fn() };
 
     await TestBed.configureTestingModule({
       imports: [CatalogPage],
@@ -39,6 +42,7 @@ describe('CatalogPage', () => {
         { provide: Book, useValue: bookStub },
         { provide: Auth, useValue: authStub },
         { provide: Loan, useValue: loanStub },
+        { provide: Reservation, useValue: reservationStub },
       ],
     }).compileComponents();
 
@@ -108,5 +112,26 @@ describe('CatalogPage', () => {
     component['onBorrow'](book);
 
     expect(alertSpy).toHaveBeenCalledWith(expect.stringContaining('no está disponible'));
+  });
+
+  it('onReserve() creates the reservation and notifies the user', () => {
+    reservationStub.create.mockReturnValue(of({ id: 1 }));
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    fixture.detectChanges();
+
+    component['onReserve'](book);
+
+    expect(reservationStub.create).toHaveBeenCalledWith(1);
+    expect(alertSpy).toHaveBeenCalledWith(expect.stringContaining('fila de espera'));
+  });
+
+  it('onReserve() shows a specific message on 409', () => {
+    reservationStub.create.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 409 })));
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    fixture.detectChanges();
+
+    component['onReserve'](book);
+
+    expect(alertSpy).toHaveBeenCalledWith(expect.stringContaining('ya tienes una reserva pendiente'));
   });
 });

@@ -11,7 +11,16 @@ const books: BookItem[] = [
     id: 2, title: 'El Hobbit', author: 'J.R.R. Tolkien', isbn: '9780261102217',
     publicationYear: 1937, status: 'PRESTADO', coverUrl: null, subjects: null, createdAt: '2026-01-01T00:00:00Z',
   },
+  {
+    id: 3, title: 'Drácula', author: 'Bram Stoker', isbn: '9780141439846',
+    publicationYear: 1897, status: 'RESERVADO', coverUrl: null, subjects: null, createdAt: '2026-01-01T00:00:00Z',
+  },
 ];
+
+function rowFor(fixture: ComponentFixture<CatalogTable>, title: string): HTMLElement {
+  const rows = fixture.nativeElement.querySelectorAll('tbody tr');
+  return Array.from(rows).find((row) => (row as HTMLElement).textContent?.includes(title)) as HTMLElement;
+}
 
 describe('CatalogTable', () => {
   let fixture: ComponentFixture<CatalogTable>;
@@ -34,26 +43,31 @@ describe('CatalogTable', () => {
     await render(false);
     expect(fixture.nativeElement.textContent).toContain('Matilda');
     expect(fixture.nativeElement.textContent).toContain('El Hobbit');
+    expect(fixture.nativeElement.textContent).toContain('Drácula');
   });
 
-  it('shows only "Pedir préstamo" for the DISPONIBLE book when canManage is false', async () => {
+  it('shows only "Pedir préstamo" for a DISPONIBLE book when canManage is false', async () => {
     await render(false);
-    const buttons = fixture.nativeElement.querySelectorAll('app-button');
+    const buttons = rowFor(fixture, 'Matilda').querySelectorAll('app-button');
     expect(buttons.length).toBe(1);
     expect(buttons[0].textContent).toContain('Pedir préstamo');
   });
 
-  it('shows both "Pedir préstamo" and "Eliminar" for the DISPONIBLE book when canManage is true', async () => {
+  it('shows both "Pedir préstamo" and "Eliminar" for a DISPONIBLE book when canManage is true', async () => {
     await render(true);
-    const buttons = fixture.nativeElement.querySelectorAll('app-button');
-    expect(buttons.length).toBe(2);
+    expect(rowFor(fixture, 'Matilda').querySelectorAll('app-button').length).toBe(2);
   });
 
-  it('shows no actions for a PRESTADO book, regardless of canManage', async () => {
+  it('shows "Reservar" (and nothing else) for a PRESTADO book, regardless of canManage', async () => {
     await render(true);
-    const rows = fixture.nativeElement.querySelectorAll('tbody tr');
-    const prestadoRow = Array.from(rows).find((row) => (row as HTMLElement).textContent?.includes('El Hobbit'));
-    expect((prestadoRow as HTMLElement).querySelectorAll('app-button').length).toBe(0);
+    const buttons = rowFor(fixture, 'El Hobbit').querySelectorAll('app-button');
+    expect(buttons.length).toBe(1);
+    expect(buttons[0].textContent).toContain('Reservar');
+  });
+
+  it('shows no actions for a RESERVADO book', async () => {
+    await render(true);
+    expect(rowFor(fixture, 'Drácula').querySelectorAll('app-button').length).toBe(0);
   });
 
   it('emits borrowBook with the right book when "Pedir préstamo" is clicked', async () => {
@@ -61,9 +75,19 @@ describe('CatalogTable', () => {
     const emitted: BookItem[] = [];
     component.borrowBook.subscribe((book) => emitted.push(book));
 
-    fixture.nativeElement.querySelector('app-button').dispatchEvent(new Event('click'));
+    rowFor(fixture, 'Matilda').querySelector('app-button')!.dispatchEvent(new Event('click'));
 
     expect(emitted).toEqual([books[0]]);
+  });
+
+  it('emits reserveBook with the right book when "Reservar" is clicked', async () => {
+    await render(false);
+    const emitted: BookItem[] = [];
+    component.reserveBook.subscribe((book) => emitted.push(book));
+
+    rowFor(fixture, 'El Hobbit').querySelector('app-button')!.dispatchEvent(new Event('click'));
+
+    expect(emitted).toEqual([books[1]]);
   });
 
   it('emits deleteBook with the right book when "Eliminar" is clicked', async () => {
@@ -71,7 +95,7 @@ describe('CatalogTable', () => {
     const emitted: BookItem[] = [];
     component.deleteBook.subscribe((book) => emitted.push(book));
 
-    const buttons = fixture.nativeElement.querySelectorAll('app-button');
+    const buttons = rowFor(fixture, 'Matilda').querySelectorAll('app-button');
     buttons[1].dispatchEvent(new Event('click')); // 0 = Pedir préstamo, 1 = Eliminar
 
     expect(emitted).toEqual([books[0]]);
