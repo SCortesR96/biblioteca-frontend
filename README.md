@@ -7,7 +7,9 @@ usuario en el navegador.
 
 > Este README documenta el frontend de forma autónoma. Para levantar todo el stack
 > (backend + PostgreSQL + MailHog + este frontend) con un solo comando, ver el
-> [`README.md` de la raíz](../README.md).
+> repositorio [biblioteca](https://github.com/SCortesR96/biblioteca), que arma este
+> proyecto y [biblioteca-backend](https://github.com/SCortesR96/biblioteca-backend) como
+> submódulos junto a un único `docker-compose.yml`.
 
 ---
 
@@ -57,7 +59,8 @@ reacciona a cambios de señal sin depender de que `zone.js` decida revisar el co
 ### Requisitos
 
 - Node.js 22+ y npm (solo para desarrollo local; para producción basta Docker)
-- El backend corriendo en `http://localhost:8080` (ver README de la raíz)
+- El backend corriendo en `http://localhost:8080` (ver
+  [biblioteca-backend](https://github.com/SCortesR96/biblioteca-backend))
 
 ### Desarrollo
 
@@ -321,7 +324,7 @@ llegan en `ApiError.message` y la página los muestra tal cual en el `Toast`.
 > **Extensión sobre el enunciado.** El PDF solo contempla el auto-registro público
 > (`/auth/register`, siempre `BIBLIOTECARIO`) y el bloqueo automático por atrasos; la
 > gestión de usuarios y el bloqueo manual se agregan para que el ADMIN pueda operar de
-> verdad. Ver la decisión completa en el [README raíz](../README.md#decisiones-de-diseño).
+> verdad.
 
 > **Base URL:** todos los servicios construyen las URLs como `` `${environment.apiUrl}/...` ``.
 > En desarrollo eso es `http://localhost:8080/api`; en producción es `/api`, que nginx
@@ -484,24 +487,27 @@ Qué se cubre:
 1. **`build`** (`node:22-alpine`): `npm ci` en su propia capa (cacheable) y
    `ng build --configuration production` → `dist/frontend/browser`.
 2. **Runtime** (`nginx:1.27-alpine`): sirve los estáticos y aplica
-   [`nginx.conf`](nginx.conf).
+   [`nginx.conf.template`](nginx.conf.template).
 
-[`nginx.conf`](nginx.conf) hace dos cosas clave:
+[`nginx.conf.template`](nginx.conf.template) hace tres cosas clave:
 
 - **SPA fallback:** `try_files $uri $uri/ /index.html` — cualquier ruta que no sea un
   archivo real cae en `index.html` para que el router de Angular la resuelva en el
   cliente (así `/my-loans` recargado directo no da 404).
 - **Proxy `/api/` → backend:** en producción el frontend habla con `/api` (mismo origen),
-  y nginx reenvía a `http://backend:8080` dentro de la red de Docker Compose, evitando
-  CORS. Usa `resolver 127.0.0.11` + variable en `proxy_pass` para **re-resolver** el
-  nombre `backend` en cada request (no solo al arrancar): así este contenedor puede
-  levantar antes que el backend, o el backend puede reiniciarse y cambiar de IP, sin
-  tumbar nginx. Se usa `$request_uri` (la URI original completa) porque con una variable
-  en `proxy_pass` nginx **no** hace el stripping automático del prefijo del `location`.
+  y nginx reenvía hacia `BACKEND_URL` (por defecto `http://backend:8080`, el nombre del
+  servicio en Docker Compose). La imagen procesa este archivo con `envsubst` al arrancar
+  el contenedor (no en build time), así que `BACKEND_URL` se puede pisar con la URL real
+  del backend cuando front y back se despliegan como servicios separados (por ejemplo, dos
+  apps distintas en un PaaS). Cuando el destino es `https://`, se agrega
+  `proxy_ssl_server_name on` para que el handshake TLS mande el SNI correcto — sin esto,
+  cualquier proxy que enrute por SNI delante del backend (Traefik, Cloudflare) no sabe a
+  qué servicio dirigir la conexión.
 - **Cache de assets:** archivos con hash (`.js`, `.css`, imágenes, fuentes) se sirven con
   `expires 30d`.
 
-El servicio se expone en el puerto 4200 del host (ver `docker-compose.yml` de la raíz).
+El servicio se expone en el puerto 80 del contenedor (mapeado al 4200 del host en el
+`docker-compose.yml` de [biblioteca](https://github.com/SCortesR96/biblioteca)).
 
 ---
 
