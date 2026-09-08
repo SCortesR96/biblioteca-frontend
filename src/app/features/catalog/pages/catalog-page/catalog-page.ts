@@ -1,7 +1,9 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Auth } from '../../../../core/services/auth';
 import { Book } from '../../../../core/services/book';
 import type { BookItem, BookSearchParams } from '../../../../core/services/book.types';
+import { Loan } from '../../../../core/services/loan';
 import { AppHeader } from '../../../../shared/ui/organisms/app-header/app-header';
 import { BookForm } from '../../components/book-form/book-form';
 import { CatalogSearch } from '../../components/catalog-search/catalog-search';
@@ -17,6 +19,7 @@ import { Button } from '../../../../shared/ui/atoms/button/button';
 })
 export class CatalogPage {
   private readonly bookService = inject(Book);
+  private readonly loanService = inject(Loan);
   private readonly auth = inject(Auth);
 
   protected readonly books = this.bookService.books;
@@ -50,6 +53,22 @@ export class CatalogPage {
     this.bookService.delete(book.id).subscribe({
       next: () => this.bookService.search(this.currentParams),
       error: () => window.alert('No se pudo eliminar el libro. Verifica que esté disponible.'),
+    });
+  }
+
+  protected onBorrow(book: BookItem): void {
+    this.loanService.create(book.id).subscribe({
+      next: () => {
+        window.alert(`"${book.title}" quedó registrado en tus préstamos.`);
+        this.bookService.search(this.currentParams);
+      },
+      error: (error: HttpErrorResponse) => {
+        window.alert(
+          error.status === 409
+            ? 'No se pudo completar el préstamo: el libro ya no está disponible o tu cuenta está bloqueada.'
+            : 'No se pudo pedir el préstamo. Intenta de nuevo.',
+        );
+      },
     });
   }
 }

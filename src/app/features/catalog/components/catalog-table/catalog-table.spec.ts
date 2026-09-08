@@ -36,22 +36,43 @@ describe('CatalogTable', () => {
     expect(fixture.nativeElement.textContent).toContain('El Hobbit');
   });
 
-  it('does not show delete buttons when canManage is false', async () => {
+  it('shows only "Pedir préstamo" for the DISPONIBLE book when canManage is false', async () => {
     await render(false);
-    expect(fixture.nativeElement.querySelectorAll('app-button').length).toBe(0);
+    const buttons = fixture.nativeElement.querySelectorAll('app-button');
+    expect(buttons.length).toBe(1);
+    expect(buttons[0].textContent).toContain('Pedir préstamo');
   });
 
-  it('shows a delete button only for the DISPONIBLE book when canManage is true', async () => {
+  it('shows both "Pedir préstamo" and "Eliminar" for the DISPONIBLE book when canManage is true', async () => {
     await render(true);
-    expect(fixture.nativeElement.querySelectorAll('app-button').length).toBe(1);
+    const buttons = fixture.nativeElement.querySelectorAll('app-button');
+    expect(buttons.length).toBe(2);
   });
 
-  it('emits deleteBook with the right book when clicked', async () => {
+  it('shows no actions for a PRESTADO book, regardless of canManage', async () => {
+    await render(true);
+    const rows = fixture.nativeElement.querySelectorAll('tbody tr');
+    const prestadoRow = Array.from(rows).find((row) => (row as HTMLElement).textContent?.includes('El Hobbit'));
+    expect((prestadoRow as HTMLElement).querySelectorAll('app-button').length).toBe(0);
+  });
+
+  it('emits borrowBook with the right book when "Pedir préstamo" is clicked', async () => {
+    await render(false);
+    const emitted: BookItem[] = [];
+    component.borrowBook.subscribe((book) => emitted.push(book));
+
+    fixture.nativeElement.querySelector('app-button').dispatchEvent(new Event('click'));
+
+    expect(emitted).toEqual([books[0]]);
+  });
+
+  it('emits deleteBook with the right book when "Eliminar" is clicked', async () => {
     await render(true);
     const emitted: BookItem[] = [];
     component.deleteBook.subscribe((book) => emitted.push(book));
 
-    fixture.nativeElement.querySelector('app-button').dispatchEvent(new Event('click'));
+    const buttons = fixture.nativeElement.querySelectorAll('app-button');
+    buttons[1].dispatchEvent(new Event('click')); // 0 = Pedir préstamo, 1 = Eliminar
 
     expect(emitted).toEqual([books[0]]);
   });

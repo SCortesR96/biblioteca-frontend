@@ -1,10 +1,12 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { Auth } from '../../../../core/services/auth';
 import { Book } from '../../../../core/services/book';
 import type { BookItem } from '../../../../core/services/book.types';
+import { Loan } from '../../../../core/services/loan';
 import { CatalogPage } from './catalog-page';
 
 const book: BookItem = {
@@ -20,6 +22,7 @@ describe('CatalogPage', () => {
     search: ReturnType<typeof vi.fn>; delete: ReturnType<typeof vi.fn>;
   };
   let authStub: { isAdmin: ReturnType<typeof signal>; currentUser: ReturnType<typeof signal> };
+  let loanStub: { create: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     bookStub = {
@@ -27,10 +30,16 @@ describe('CatalogPage', () => {
       search: vi.fn(), delete: vi.fn(),
     };
     authStub = { isAdmin: signal(true), currentUser: signal({ name: 'Ana', email: 'a@a.com', role: 'ADMIN' }) };
+    loanStub = { create: vi.fn() };
 
     await TestBed.configureTestingModule({
       imports: [CatalogPage],
-      providers: [provideRouter([]), { provide: Book, useValue: bookStub }, { provide: Auth, useValue: authStub }],
+      providers: [
+        provideRouter([]),
+        { provide: Book, useValue: bookStub },
+        { provide: Auth, useValue: authStub },
+        { provide: Loan, useValue: loanStub },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CatalogPage);
@@ -77,5 +86,27 @@ describe('CatalogPage', () => {
     authStub.isAdmin.set(false);
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).not.toContain('Registrar libro');
+  });
+
+  it('onBorrow() creates the loan, notifies the user and refreshes the catalog', () => {
+    loanStub.create.mockReturnValue(of({ id: 1 }));
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    fixture.detectChanges();
+
+    component['onBorrow'](book);
+
+    expect(loanStub.create).toHaveBeenCalledWith(1);
+    expect(alertSpy).toHaveBeenCalled();
+    expect(bookStub.search).toHaveBeenCalledTimes(2); // init + post-borrow refresh
+  });
+
+  it('onBorrow() shows a specific message on 409 (no disponible / cuenta bloqueada)', () => {
+    loanStub.create.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 409 })));
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    fixture.detectChanges();
+
+    component['onBorrow'](book);
+
+    expect(alertSpy).toHaveBeenCalledWith(expect.stringContaining('no está disponible'));
   });
 });

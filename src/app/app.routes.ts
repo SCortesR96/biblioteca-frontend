@@ -12,5 +12,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/catalog/pages/catalog-page/catalog-page').then((m) => m.CatalogPage),
   },
+  {
+    path: 'mis-prestamos',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/loans/pages/my-loans-page/my-loans-page').then((m) => m.MyLoansPage),
+  },
   { path: '**', redirectTo: '' },
 ];

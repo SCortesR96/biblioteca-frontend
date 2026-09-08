@@ -47,4 +47,19 @@ describe('AppHeader', () => {
 
     expect(fixture.nativeElement.querySelector('app-button')).toBeNull();
   });
+
+  it('shows navigation links to the catalog and "Mis préstamos" when there is a session', () => {
+    const links = fixture.nativeElement.querySelectorAll('nav a');
+    const hrefs = Array.from(links).map((a) => (a as HTMLAnchorElement).getAttribute('href'));
+    expect(hrefs).toContain('/');
+    expect(hrefs).toContain('/mis-prestamos');
+  });
+
+  it('hides navigation when there is no session', async () => {
+    authStub.currentUser.set(null);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('nav')).toBeNull();
+  });
 });

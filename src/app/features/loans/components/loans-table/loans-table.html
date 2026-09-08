@@ -1,0 +1,35 @@
+<p-table [value]="loans()" [loading]="loading()" dataKey="id" [rowTrackBy]="trackById" styleClass="w-full">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Libro</th>
+      <th>ISBN</th>
+      <th>Fecha de préstamo</th>
+      <th>Fecha límite</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-loan>
+    <tr>
+      <td>{{ loan.bookTitle }}</td>
+      <td>{{ loan.bookIsbn }}</td>
+      <td>{{ loan.loanDate }}</td>
+      <td>{{ loan.dueDate }}</td>
+      <td>
+        <app-overdue-badge [returned]="loan.returnDate !== null" [overdue]="loan.overdue" />
+      </td>
+      <td>
+        @if (!loan.returnDate) {
+          <app-button label="Devolver" (click)="returnLoan.emit(loan)" class="text-sm" />
+        }
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="6" class="text-center text-surface-500 py-6">Todavía no tienes préstamos.</td>
+    </tr>
+  </ng-template>
+</p-table>

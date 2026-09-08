@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { Auth } from '../../../../core/services/auth';
 import { Button } from '../../atoms/button/button';
 
 @Component({
   selector: 'app-header',
-  imports: [Button],
+  imports: [Button, RouterLink, RouterLinkActive],
   templateUrl: './app-header.html',
   styleUrl: './app-header.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

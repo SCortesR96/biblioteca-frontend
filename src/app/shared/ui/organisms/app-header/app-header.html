@@ -1,5 +1,20 @@
 <header class="flex items-center justify-between bg-white dark:bg-surface-900 shadow-sm px-6 py-4">
-  <h1 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Biblioteca</h1>
+  <div class="flex items-center gap-6">
+    <h1 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Biblioteca</h1>
+
+    @if (currentUser()) {
+      <nav class="flex items-center gap-4 text-sm">
+        <a routerLink="/" routerLinkActive="font-semibold text-primary-600" [routerLinkActiveOptions]="{ exact: true }"
+           class="text-surface-600 dark:text-surface-300 hover:text-primary-600">
+          Catálogo
+        </a>
+        <a routerLink="/mis-prestamos" routerLinkActive="font-semibold text-primary-600"
+           class="text-surface-600 dark:text-surface-300 hover:text-primary-600">
+          Mis préstamos
+        </a>
+      </nav>
+    }
+  </div>
 
   @if (currentUser(); as user) {
     <div class="flex items-center gap-4">

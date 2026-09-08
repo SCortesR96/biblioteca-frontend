@@ -17,6 +17,7 @@ export class CatalogTable {
   readonly loading = input(false);
 
   readonly deleteBook = output<BookItem>();
+  readonly borrowBook = output<BookItem>();
 
   protected trackById(_index: number, book: BookItem): number {
     return book.id;

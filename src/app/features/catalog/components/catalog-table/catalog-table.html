@@ -6,9 +6,7 @@
       <th>ISBN</th>
       <th>Año</th>
       <th>Estado</th>
-      @if (canManage()) {
-        <th>Acciones</th>
-      }
+      <th>Acciones</th>
     </tr>
   </ng-template>
 
@@ -19,19 +17,22 @@
       <td>{{ book.isbn }}</td>
       <td>{{ book.publicationYear ?? '—' }}</td>
       <td><app-status-badge [status]="book.status" /></td>
-      @if (canManage()) {
-        <td>
+      <td>
+        <div class="flex gap-2">
           @if (book.status === 'DISPONIBLE') {
+            <app-button label="Pedir préstamo" (click)="borrowBook.emit(book)" class="text-sm" />
+          }
+          @if (canManage() && book.status === 'DISPONIBLE') {
             <app-button label="Eliminar" (click)="deleteBook.emit(book)" class="text-sm" />
           }
-        </td>
-      }
+        </div>
+      </td>
     </tr>
   </ng-template>
 
   <ng-template pTemplate="emptymessage">
     <tr>
-      <td [attr.colspan]="canManage() ? 6 : 5" class="text-center text-surface-500 py-6">
+      <td colspan="6" class="text-center text-surface-500 py-6">
         No hay libros que coincidan con la búsqueda.
       </td>
     </tr>

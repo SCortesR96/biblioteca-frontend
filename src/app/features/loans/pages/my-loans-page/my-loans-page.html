@@ -1,0 +1,13 @@
+<app-header />
+
+<div class="max-w-6xl mx-auto p-6 flex flex-col gap-4">
+  <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Mis préstamos</h2>
+
+  @if (error(); as message) {
+    <p class="text-sm text-red-600" role="alert">{{ message }}</p>
+  }
+
+  <div class="bg-white dark:bg-surface-900 rounded-lg shadow-sm p-4">
+    <app-loans-table [loans]="loans()" [loading]="loading()" (returnLoan)="onReturn($event)" />
+  </div>
+</div>
