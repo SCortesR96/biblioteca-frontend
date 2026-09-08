@@ -6,12 +6,8 @@ import { Button } from '../../../../shared/ui/atoms/button/button';
 import { TextInput } from '../../../../shared/ui/atoms/text-input/text-input';
 import { FormField } from '../../../../shared/ui/molecules/form-field/form-field';
 
-/**
- * Alta de libro para ADMIN. "Autocompletar desde ISBN" llama a la previsualización
- * (nunca guarda nada por sí sola) y precarga el resto del formulario; el bibliotecario
- * puede editar cualquier campo antes de confirmar. Si el ISBN no se encuentra, el
- * formulario queda intacto para completarlo a mano — nunca bloquea el alta.
- */
+// Alta de libro. "Autocompletar desde ISBN" solo precarga el formulario, nunca guarda solo;
+// si no encuentra nada, queda intacto para completarlo a mano.
 @Component({
   selector: 'app-book-form',
   imports: [ReactiveFormsModule, TextInput, Button, FormField],
