@@ -28,6 +28,11 @@ server {
         # fijo aquí (p. ej. "/api/") se usaría literal para TODAS las requests, perdiendo
         # el resto de la ruta real (bug real, encontrado probando de verdad).
         proxy_pass $backend_upstream$request_uri;
+        # Necesario cuando BACKEND_URL es https:// y va por variable: sin esto nginx no
+        # manda el SNI correcto en el handshake TLS, y un proxy/router que enruta por SNI
+        # (Traefik, en un despliegue con front y back como apps separadas) no sabe a qué
+        # servicio dirigir la conexión y la rechaza (bug real, encontrado en producción).
+        proxy_ssl_server_name on;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
