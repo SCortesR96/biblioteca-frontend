@@ -119,4 +119,15 @@ describe('LoginForm', () => {
 
     expect(submitButton().disabled).toBe(false);
   });
+
+  it('ignores a second submit while the first request is still in flight', async () => {
+    const pending = new Subject<AuthResponse>();
+    authStub.login.mockReturnValue(pending.asObservable());
+
+    fillForm('ana@biblioteca.com', 'password123');
+    await submit();
+    await submit(); // segundo clic/Enter antes de que responda el primero
+
+    expect(authStub.login).toHaveBeenCalledTimes(1);
+  });
 });

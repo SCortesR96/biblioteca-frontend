@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { UiFeedback } from '../../../../core/services/ui-feedback';
 import { LoginForm } from '../../components/login-form/login-form';
 
 @Component({
@@ -11,8 +12,10 @@ import { LoginForm } from '../../components/login-form/login-form';
 })
 export class LoginPage {
   private readonly router = inject(Router);
+  private readonly ui = inject(UiFeedback);
 
   protected onLoggedIn(): void {
+    this.ui.success('Sesión iniciada correctamente');
     this.router.navigateByUrl('/');
   }
 }

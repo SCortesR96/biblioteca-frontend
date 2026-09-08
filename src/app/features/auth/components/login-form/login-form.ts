@@ -57,6 +57,12 @@ export class LoginForm {
   });
 
   protected submit(): void {
+    // Ademas del [disabled] del botón mientras submitting() es true: un guard aquí no
+    // depende de que la UI ya haya repintado, y cubre también un doble Enter en el form.
+    if (this.submitting()) {
+      return;
+    }
+
     this.submitted.set(true);
     this.loginError.set(null);
 
