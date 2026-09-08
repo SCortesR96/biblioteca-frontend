@@ -1,0 +1,24 @@
+<app-data-table
+  [value]="loans()"
+  [columns]="columns"
+  [globalFilterFields]="['bookTitle', 'bookIsbn', 'borrowerName', 'borrowerEmail']"
+  searchPlaceholder="Buscar por libro, ISBN o prestatario..."
+  emptyMessage="No hay préstamos que coincidan."
+>
+  <ng-template appColumnTemplate="borrower" let-loan>
+    <div class="flex flex-col">
+      <span>{{ loan.borrowerName }}</span>
+      <span class="text-xs text-surface-500">{{ loan.borrowerEmail }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template appColumnTemplate="estado" let-loan>
+    <app-overdue-badge [returned]="loan.returnDate !== null" [overdue]="loan.overdue" />
+  </ng-template>
+
+  <ng-template appColumnTemplate="actions" let-loan>
+    @if (!loan.returnDate) {
+      <app-button label="Devolver" (click)="returnLoan.emit(loan)" class="text-sm" />
+    }
+  </ng-template>
+</app-data-table>

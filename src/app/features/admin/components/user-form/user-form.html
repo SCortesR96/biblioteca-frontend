@@ -1,0 +1,52 @@
+<form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-4" novalidate>
+  <app-form-field label="Nombre" inputId="user-name" [errorMessage]="nameError()">
+    <app-text-input id="user-name" formControlName="name" />
+  </app-form-field>
+
+  <app-form-field label="Correo" inputId="user-email" [errorMessage]="emailError()">
+    <app-text-input id="user-email" type="email" autocomplete="off" formControlName="email" />
+  </app-form-field>
+  @if (isEdit()) {
+    <p class="-mt-2 text-xs text-surface-500">
+      El correo no se puede cambiar: es la identidad de la cuenta.
+    </p>
+  }
+
+  @if (!isEdit()) {
+    <app-form-field label="Contraseña" inputId="user-password" [errorMessage]="passwordError()">
+      <app-text-input
+        id="user-password"
+        type="password"
+        autocomplete="new-password"
+        formControlName="password"
+      />
+    </app-form-field>
+  }
+
+  <div class="flex flex-col gap-1">
+    <label for="user-role" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+      >Rol</label
+    >
+    <p-select
+      id="user-role"
+      formControlName="role"
+      [options]="roleOptions"
+      optionLabel="label"
+      optionValue="value"
+      class="w-full"
+    />
+  </div>
+
+  @if (submitError(); as message) {
+    <p class="text-sm text-red-600" role="alert">{{ message }}</p>
+  }
+
+  <div class="flex gap-2">
+    <app-button
+      [label]="isEdit() ? 'Guardar cambios' : 'Crear usuario'"
+      type="submit"
+      [loading]="submitting()"
+    />
+    <app-button label="Cancelar" type="button" (click)="cancel()" class="p-button-secondary" />
+  </div>
+</form>

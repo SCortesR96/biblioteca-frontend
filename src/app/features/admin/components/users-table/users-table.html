@@ -1,0 +1,39 @@
+<app-data-table
+  [value]="users()"
+  [columns]="columns"
+  [globalFilterFields]="['name', 'email']"
+  [selectFilter]="roleFilter"
+  searchPlaceholder="Buscar por nombre o correo..."
+  emptyMessage="No hay usuarios que coincidan."
+>
+  <ng-template appColumnTemplate="role" let-user>
+    <p-tag [value]="roleLabel(user.role)" [severity]="user.role === 'ADMIN' ? 'danger' : 'info'" />
+  </ng-template>
+
+  <ng-template appColumnTemplate="status" let-user>
+    @if (user.blocked) {
+      <p-tag value="Bloqueada" severity="warn" />
+      <span class="ml-2 text-xs text-surface-500"
+        >hasta {{ user.blockedUntil | date: 'short' }}</span
+      >
+    } @else {
+      <p-tag value="Activa" severity="success" />
+    }
+  </ng-template>
+
+  <ng-template appColumnTemplate="createdAt" let-user>
+    {{ user.createdAt | date: 'shortDate' }}
+  </ng-template>
+
+  <ng-template appColumnTemplate="actions" let-user>
+    <div class="flex flex-wrap gap-2">
+      <app-button label="Editar" (click)="edit.emit(user)" class="text-sm" />
+      @if (user.blocked) {
+        <app-button label="Desbloquear" (click)="unblock.emit(user)" class="text-sm" />
+      } @else {
+        <app-button label="Bloquear" (click)="block.emit(user)" class="text-sm" />
+      }
+      <app-button label="Eliminar" (click)="remove.emit(user)" class="text-sm" />
+    </div>
+  </ng-template>
+</app-data-table>

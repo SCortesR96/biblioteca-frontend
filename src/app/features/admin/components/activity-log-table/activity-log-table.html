@@ -1,0 +1,20 @@
+<app-data-table
+  [value]="entries()"
+  [columns]="columns"
+  [globalFilterFields]="['actorEmail', 'description']"
+  [selectFilter]="actionFilter"
+  searchPlaceholder="Buscar por usuario o detalle..."
+  emptyMessage="Todavía no hay actividad registrada."
+>
+  <ng-template appColumnTemplate="createdAt" let-entry>
+    {{ entry.createdAt | date: 'short' }}
+  </ng-template>
+
+  <ng-template appColumnTemplate="actorEmail" let-entry>
+    {{ entry.actorEmail ?? 'sistema' }}
+  </ng-template>
+
+  <ng-template appColumnTemplate="action" let-entry>
+    <p-tag [value]="labelFor(entry.action)" [severity]="severityFor(entry.action)" />
+  </ng-template>
+</app-data-table>

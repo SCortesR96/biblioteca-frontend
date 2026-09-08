@@ -12,14 +12,96 @@
   </section>
 
   <section>
-    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-4">Cuentas bloqueadas</h2>
-    <app-blocked-users-table [users]="blockedUsers()" (unblock)="onUnblock($event)" />
+    <div class="flex items-center justify-between mb-4 gap-3">
+      <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Usuarios</h2>
+      @if (!formOpen()) {
+        <app-button label="Crear usuario" (click)="startCreate()" class="w-auto" />
+      }
+    </div>
+
+    @if (formOpen()) {
+      <div class="bg-white dark:bg-surface-900 rounded-lg shadow-sm p-4 mb-4">
+        <h3 class="text-sm font-semibold text-surface-700 dark:text-surface-200 mb-3">
+          {{ editing() ? 'Editar cuenta' : 'Nueva cuenta' }}
+        </h3>
+        <app-user-form [user]="editing()" (saved)="onFormSaved()" (cancelled)="closeForm()" />
+      </div>
+    }
+
+    <app-users-table
+      [users]="users()"
+      (edit)="startEdit($event)"
+      (block)="openBlockDialog($event)"
+      (unblock)="onUnblock($event)"
+      (remove)="onRemove($event)"
+    />
   </section>
 
   <section>
-    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-4">Bitácora de errores</h2>
+    <div class="flex items-center justify-between mb-4 gap-3">
+      <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0">Préstamos</h2>
+      <label class="flex items-center gap-2 text-sm text-surface-600 dark:text-surface-300">
+        <input
+          type="checkbox"
+          [checked]="loansIncludeReturned()"
+          (change)="toggleIncludeReturned()"
+        />
+        Incluir devueltos
+      </label>
+    </div>
+    <app-admin-loans-table [loans]="loans()" (returnLoan)="onReturnLoan($event)" />
+  </section>
+
+  <section>
+    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-4">Actividad</h2>
+    @if (activity(); as log) {
+      <app-activity-log-table [entries]="log.content" />
+    }
+  </section>
+
+  <section>
+    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-0 mb-4">
+      Bitácora de errores
+    </h2>
     @if (errorLogs(); as logs) {
       <app-error-log-table [logs]="logs.content" />
     }
   </section>
 </div>
+
+<p-dialog
+  [visible]="blockTarget() !== null"
+  (onHide)="closeBlockDialog()"
+  [modal]="true"
+  [draggable]="false"
+  [dismissableMask]="true"
+  header="Bloquear cuenta"
+  [style]="{ width: '24rem' }"
+>
+  @if (blockTarget(); as user) {
+    <form (ngSubmit)="confirmBlock()" class="flex flex-col gap-4" novalidate>
+      <p class="text-sm text-surface-600 dark:text-surface-300">
+        {{ user.name }} ({{ user.email }}) no podrá pedir nuevos préstamos durante el período
+        indicado.
+      </p>
+
+      <app-form-field
+        label="Días de bloqueo"
+        inputId="block-days"
+        [errorMessage]="blockDaysError()"
+      >
+        <app-text-input id="block-days" [formControl]="blockDays" />
+      </app-form-field>
+
+      <div class="flex justify-end gap-2">
+        <app-button
+          label="Cancelar"
+          type="button"
+          (click)="closeBlockDialog()"
+          class="p-button-secondary"
+        />
+        <app-button label="Bloquear" type="submit" [disabled]="blockDaysError() !== null" />
+      </div>
+    </form>
+  }
+</p-dialog>
